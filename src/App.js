@@ -1,4 +1,5 @@
 import React from "react";
+
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Measure from "./Components/Pages/Measure/Measure";
 import ModalMeasure from "./Components/Pages/Measure/Modal.Measure";
@@ -6,7 +7,7 @@ import ModalMeasure from "./Components/Pages/Measure/Modal.Measure";
 // Definindo as rotas
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/measure",
     element: <Measure />,
   },
   {

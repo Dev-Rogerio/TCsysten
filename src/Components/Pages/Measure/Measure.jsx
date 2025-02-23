@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
 import axios from "axios";
 import { redirectDocument, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-// import InputMask from "react-input-mask";
-import InputMask from "inputmask";
-// import InputMask from "react-input-mask";
 
 import Colarinho from "../../AssetsIcons/typeColarinho.png";
 import Duplo from "../../AssetsIcons/duplo.png";
@@ -155,6 +153,7 @@ function Measure() {
     }
   };
   const handleCpfChange = (event) => {
+    // setCpf(event.target.value);
     setCpf(event.target.value);
   };
   // const handlePrint = () => {
@@ -175,7 +174,7 @@ function Measure() {
     setClearQuadril("");
     setClearCumprimento("");
     setBiceps("");
-    antebraco("");
+    setAntebraco("");
     setClearPunho("");
     setClearMetro("");
     setClearMonograma("");
@@ -1169,7 +1168,7 @@ function Measure() {
 
           <div className="_wrapper-div">
             <div className="_wrapper-area">
-              <div>
+              <form>
                 <textarea
                   className="for-text"
                   name="comments"
@@ -1180,14 +1179,13 @@ function Measure() {
                   value={description}
                   onChange={handleDescriptionChange}
                 ></textarea>
-              </div>
+              </form>
             </div>
           </div>
 
           <footer className="_wrapper-div">
             <section className="_wrapper-divFooter">
               <div className="areaButton">
-                {/* <button>Sair</button> */}
                 <button
                   type="button"
                   onClick={(e) => {
@@ -1201,8 +1199,9 @@ function Measure() {
                 >
                   Enviar
                 </button>
-                {/* {/* <button onClick={""}>Imprimir</button> */}
-                {/* <button type="button">Cadastro</button> */}
+
+                <button type="button">Sair</button>
+                <button type="button">Limpar</button>
               </div>
             </section>
           </footer>
