@@ -1,9 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import "../Measure/modal.select.css";
 import { IconButton } from "@mui/material";
 import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 
 const ModalSelect = ({ openSelect = false, rows, setRows }) => {
+  // Memoiza a função para evitar re-renderizações desnecessárias
+  const addRow = useCallback(() => {
+    setRows((prevRows) => [
+      ...prevRows,
+      { codTextil: "", codProduct: "", texture: "", fornecedor: "" },
+    ]);
+  }, [setRows]); // Depende apenas de setRows
+
+  useEffect(() => {
+    if (!Array.isArray(rows) || rows.length === 0) {
+      addRow();
+    }
+  }, [rows, addRow]); // Agora `addRow` é estável e o warning some
   // Garante pelo menos uma linha inicial no formulário
   useEffect(() => {
     if (!Array.isArray(rows) || rows.length === 0) {
@@ -17,12 +30,12 @@ const ModalSelect = ({ openSelect = false, rows, setRows }) => {
     setRows(updatedRows);
   };
 
-  const addRow = () => {
-    setRows([
-      ...rows,
-      { codTextil: "", codProduct: "", texture: "", fornecedor: "" },
-    ]);
-  };
+  // const addRow = () => {
+  //   setRows([
+  //     ...rows,
+  //     { codTextil: "", codProduct: "", texture: "", fornecedor: "" },
+  //   ]);
+  // };
 
   const removeRow = (index) => {
     if (rows.length > 1) {
@@ -51,6 +64,9 @@ const ModalSelect = ({ openSelect = false, rows, setRows }) => {
     { value: "cataguases", label: "Cataguases" },
     { value: "estoque-cotovia", label: "Estoque" },
   ];
+  useEffect(() => {
+    // seu código
+  }, [addRow]); // Adicionando addRow nas dependências
 
   return (
     openSelect && (
