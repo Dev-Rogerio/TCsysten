@@ -1,22 +1,16 @@
-import React from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Measure from "./Components/Pages/Measure/Measure";
-import ModalMeasure from "./Components/Pages/Measure/Modal.Measure";
-
-// Definindo as rotas
-const router = createBrowserRouter([
-  {
-    path: "/measure",
-    element: <Measure />,
-  },
-  {
-    path: "/modalmeasure",
-    element: <ModalMeasure />,
-  },
-]);
+import NotFound from "./Components/Pages/NotFound/NotFound"; // Verifique se o caminho está correto
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Measure />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;
