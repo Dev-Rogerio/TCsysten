@@ -151,23 +151,18 @@ h2 {
   border: none;
   font-size: 0.5em;
 }
-.sectorBotton {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  gap: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  margin-top: 10px;
-  padding: 5px 0;
+
+.areaButton button {
+  font-size: 10px;
 }
-.sectorBotton button {
-  width: 30%;
-  height: 15px;
-  border-radius: 4px;
-  font-size: 0.6em;
-  background-color: #5559;
-  border: none;
+._wrapper-divFooter .areaButton button:nth-of-type(3) {
+  background-color: yellow;
+  color: black;
 }
+._wrapper-divFooter .areaButton button:nth-of-type(3):hover {
+  background-color: rgb(226, 226, 15);
+}
+
 ._containnerModalMeasure {
   display: flex;
   flex-direction: column;

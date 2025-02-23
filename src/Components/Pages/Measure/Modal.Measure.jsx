@@ -1,42 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LogoCotovia from "../../AssetsIcons/cotovia.png";
 import "../Measure/Modal.Measure.css";
+import { useNavigate } from "react-router-dom";
 
-const ModalMeasure = ({
-  openMeasure,
-  setOpenMeasure,
-  rows,
-  setRows,
-  cpf,
-  colar,
-  pala,
-  manga,
-  cintura,
-  quadril,
-  cumprimento,
-  biceps,
-  antebraco,
-  punhoEsquerdo,
-  punhoDireito,
-  torax,
-  extraRigido,
-  barbatana,
-  modelColar,
-  vendedor,
-  id,
-  inputDate,
-  deliveryDate,
-  metersTissue,
-  monograma,
-  modelFish,
-  typeFront,
-  typeModel,
-  typePense,
-  description = "",
-}) => {
+const ModalMeasure = (props) => {
+  const {
+    openMeasure,
+    setOpenMeasure,
+    rows, // rows precisa ser tratado corretamente
+    setRows,
+    cpf,
+    colar,
+    pala,
+    manga,
+    cintura,
+    quadril,
+    cumprimento,
+    biceps,
+    antebraco,
+    punhoEsquerdo,
+    punhoDireito,
+    torax,
+    extraRigido,
+    barbatana,
+    modelColar,
+    vendedor,
+    id,
+    inputDate,
+    deliveryDate,
+    metersTissue,
+    monograma,
+    modelFish,
+    typeFront,
+    typeModel,
+    typePense,
+    description = "",
+  } = props;
+
   const [localDescription, setLocalDescription] = useState(description || "");
+  const navigate = useNavigate();
 
-  if (!openMeasure) return null;
+  useEffect(() => {
+    if (!openMeasure) return;
+
+    // Verifica se os dados estão no localStorage e os recupera
+    const savedRows = localStorage.getItem("rows");
+    const savedDescription = localStorage.getItem("localDescription");
+
+    if (savedRows) {
+      setRows(JSON.parse(savedRows));
+    }
+    if (savedDescription) {
+      setLocalDescription(savedDescription);
+    }
+  }, [openMeasure, setRows]);
 
   const API_URL = "https://tales-cotovia.onrender.com"; // URL do servidor Render
 
@@ -90,7 +107,7 @@ const ModalMeasure = ({
       typePense,
       description: localDescription,
     };
-    // Log para verificar os dados que estão sendo enviados
+
     console.log("Dados que estão sendo enviados:", emailData);
 
     try {
@@ -119,9 +136,35 @@ const ModalMeasure = ({
   };
 
   const handleCloseModal = () => {
-    setRows((prev) => ({ ...prev, description: localDescription }));
-    setOpenMeasure(false);
+    // Salva os dados no localStorage antes de navegar
+    localStorage.setItem("rows", JSON.stringify(rows));
+    localStorage.setItem("localDescription", localDescription);
+
+    setRows(rows); // Mantém os dados no estado
+    setOpenMeasure(false); // Fecha o modal
+
+    // Navega para a página de measure
+    navigate("/measure");
   };
+
+  const renderRowDetails = () => {
+    if (rows && typeof rows === "object" && !Array.isArray(rows)) {
+      const rowEntries = Object.entries(rows);
+      return (
+        <div className="_wrapper-InfoDescription">
+          {rowEntries.map(([key, value]) => (
+            <p key={key}>
+              {key}: <strong>{value || "N/A"}</strong>
+            </p>
+          ))}
+        </div>
+      );
+    } else {
+      return <p>Informações de produto não disponíveis</p>;
+    }
+  };
+
+  if (!openMeasure) return null;
 
   return (
     <div className="modal">
@@ -236,31 +279,17 @@ const ModalMeasure = ({
         </div>
 
         <div className="sectorBotton">
-          {/* <button onClick={handleCloseModal}>Confirmar</button>
-          <button onClick={handlePrint}>Imprimir</button>*/}
-          <button onClick={handleSendEmail}>Enviar E-mail</button>
+          <section className="_wrapper-divFooter">
+            <div className="areaButton">
+              <button onClick={handleSendEmail}>Enviar E-mail</button>
+              <button onClick={handlePrint}>Emprimir</button>
+              <button onClick={handleCloseModal}>Voltar</button>
+            </div>
+          </section>
         </div>
 
-        {rows && rows.length > 0 ? (
-          rows.map((row, index) => (
-            <div key={index} className="_wrapper-InfoDescription">
-              <p>
-                Código do Tecido: <strong>{row.codTextil || "N/A"}</strong>
-              </p>
-              <p>
-                Código do Produto: <strong>{row.codProduct || "N/A"}</strong>
-              </p>
-              <p>
-                Tipo de Textura: <strong>{row.texture || "N/A"}</strong>
-              </p>
-              <p>
-                Fornecedor: <strong>{row.fornecedor || "N/A"}</strong>
-              </p>
-            </div>
-          ))
-        ) : (
-          <p>Nenhum dado disponível</p>
-        )}
+        {/* Renderizar detalhes da linha */}
+        {renderRowDetails()}
       </div>
     </div>
   );

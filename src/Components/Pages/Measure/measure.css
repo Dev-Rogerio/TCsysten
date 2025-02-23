@@ -3,6 +3,15 @@
   padding: 0;
   margin: 0;
 }
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #19a152;
+  --text-color: #333;
+  --background-color: #f4f4f4;
+  --button-houver-color: #208048;
+  --button-sair-color: orange;
+}
+
 hr {
   margin-top: 5px;
   margin-bottom: 5px;
@@ -47,13 +56,14 @@ hr {
   font-size: 1em;
 }
 .for-text {
-  width: auto;
+  width: 100%;
   margin: 0 10px 0 0;
   display: flex;
   align-items: center;
   margin-bottom: 6px;
   font-size: 0.7em;
   color: #333;
+  resize: vertical;
 }
 .for-Inputs {
   padding: 6px 10px;
@@ -541,18 +551,46 @@ hr {
 }
 .areaButton {
   display: flex;
+  justify-content: end;
   width: 100%;
   gap: 10px;
 }
 .areaButton button {
-  width: 25%;
+  display: flex;
+  justify-content: center;
+  width: 10%;
   padding: 3px 0;
   border: 1px solid #2229;
+  background-color: var(--secondary-color);
   outline: none;
   border-radius: 4px;
+  color: #fff;
 }
+
+.areaButton button:hover {
+  background-color: var(--button-houver-color);
+  color: white;
+}
+.areaButton button:active {
+  transform: translateY(2px);
+  box-shadow: 0px 2px 4px #00000033;
+}
+
 .areaButton button:nth-of-type(2) {
-  background-color: teal;
+  background-color: var(--button-sair-color);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  color: black;
+  position: relative; /* Para posicionar o tooltip corretamente */
+}
+
+.areaButton button:nth-of-type(2) {
+  background-color: var(--button-sair-color); /* Laranja claro */
+  transition: background-color 0.3s ease;
+  color: black;
+}
+
+.areaButton button:nth-of-type(2):hover {
+  background-color: #ffa600be; /* Laranja mais escuro */
 }
 
 ._wrapper-area {
@@ -650,13 +688,14 @@ textarea {
     padding: 0 10px;
   }
   .for-text {
-    width: auto;
+    width: 100%;
     display: flex;
     align-items: center;
     font-size: 0.4em;
     color: #333;
     margin: 0;
     padding: 0;
+    resize: vertical;
   }
   .for-Inputs {
     font-size: 0.4em;

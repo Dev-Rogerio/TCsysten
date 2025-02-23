@@ -6,7 +6,7 @@ import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 const ModalSelect = ({ openSelect = false, rows, setRows }) => {
   // Garante pelo menos uma linha inicial no formulário
   useEffect(() => {
-    if (rows.length === 0) {
+    if (!Array.isArray(rows) || rows.length === 0) {
       addRow();
     }
   }, [rows]);
@@ -23,11 +23,13 @@ const ModalSelect = ({ openSelect = false, rows, setRows }) => {
       { codTextil: "", codProduct: "", texture: "", fornecedor: "" },
     ]);
   };
+
   const removeRow = (index) => {
     if (rows.length > 1) {
       setRows(rows.filter((_, i) => i !== index));
     }
   };
+
   const productOptions = [
     { value: "azul-claro", label: "Azul Claro" },
     { value: "azul-medio", label: "Azul Médio" },
@@ -57,14 +59,14 @@ const ModalSelect = ({ openSelect = false, rows, setRows }) => {
           <thead>
             <tr>
               <th>Cód. do Produto</th>
-              <th>Cód. do Tecido </th>
+              <th>Cód. do Tecido</th>
               <th>Textura</th>
               <th>Fornecedor</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody className="_tab-tbody">
-            {rows.map((row, index) => (
+            {(Array.isArray(rows) ? rows : []).map((row, index) => (
               <tr key={index}>
                 {/* Cód. Produto */}
                 <td>
@@ -133,7 +135,7 @@ const ModalSelect = ({ openSelect = false, rows, setRows }) => {
                 </td>
 
                 {/* Ações */}
-                {/* <td className="_button-Acoes">
+                <td className="_button-Acoes">
                   <IconButton
                     onClick={addRow}
                     aria-label="Adicionar linha"
@@ -149,7 +151,7 @@ const ModalSelect = ({ openSelect = false, rows, setRows }) => {
                   >
                     <DeleteIcon fontSize="small" />
                   </IconButton>
-                </td> */}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -158,4 +160,5 @@ const ModalSelect = ({ openSelect = false, rows, setRows }) => {
     )
   );
 };
+
 export default ModalSelect;
