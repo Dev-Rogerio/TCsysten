@@ -34,6 +34,7 @@ app.post("/send-email", async (req, res) => {
       .json({ message: "Campos obrigatórios estão ausentes." });
   }
 
+  // Criando o documento PDF
   const doc = new PDFDocument();
   let buffers = [];
 
@@ -49,7 +50,8 @@ app.post("/send-email", async (req, res) => {
       attachments: [
         {
           filename: `Pedido-${emailData.cpf}.pdf`,
-          content: pdfData,
+          content: pdfData, // Anexa o PDF no e-mail
+          contentType: "application/pdf",
         },
       ],
     };
@@ -65,6 +67,8 @@ app.post("/send-email", async (req, res) => {
         .json({ message: "Erro ao enviar e-mail.", error: error.message });
     }
   });
+
+  // Adicionando conteúdo ao PDF
 
   doc
     .fontSize(16)
