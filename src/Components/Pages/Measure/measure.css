@@ -4,12 +4,13 @@
   margin: 0;
 }
 :root {
-  --primary-color: #3498db;
+  --primary-color: #0178c7;
   --secondary-color: #19a152;
   --text-color: #333;
   --background-color: #f4f4f4;
   --button-houver-color: #208048;
-  --button-sair-color: orange;
+  --button-sair-color: #ccc;
+  --button-houverBlue: #2696e0;
 }
 
 hr {
@@ -559,7 +560,7 @@ hr {
   display: flex;
   justify-content: center;
   width: 10%;
-  padding: 3px 0;
+  padding: 8px 0;
   border: 1px solid #2229;
   background-color: var(--secondary-color);
   outline: none;
@@ -577,7 +578,7 @@ hr {
 }
 
 .areaButton button:nth-of-type(2) {
-  background-color: var(--button-sair-color);
+  background-color: var(--primary-color);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
   color: black;
   position: relative; /* Para posicionar o tooltip corretamente */
@@ -586,11 +587,11 @@ hr {
 .areaButton button:nth-of-type(2) {
   background-color: var(--button-sair-color); /* Laranja claro */
   transition: background-color 0.3s ease;
-  color: black;
+  color: #fff;
 }
 
 .areaButton button:nth-of-type(2):hover {
-  background-color: #ffa600be; /* Laranja mais escuro */
+  background-color: var(--button-houverBlue); /* Laranja mais escuro */
 }
 
 ._wrapper-area {
@@ -809,11 +810,12 @@ textarea {
   }
   .areaButton button {
     font-size: 8px;
+    padding: 10px 0;
   }
   .areaButton button:nth-of-type(2) {
     background-color: rgb(43, 217, 43);
   }
   .areaButton button:nth-of-type(3) {
-    background-color: orange;
+    background-color: var(--primary-color);
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
 import { redirectDocument, useLocation } from "react-router-dom";
@@ -75,7 +75,7 @@ function Measure() {
   const [barbatana, setBarbatana] = useState("");
   const [modelColar, setModelColar] = useState("");
   const [vendedor, setVendedor] = useState("");
-  const [id, setId] = useState("");
+  const [id, setId] = useState(1);
   const [deliveryDate, setDeliveryDate] = useState("");
   const [metersTissue, setMetersTissue] = useState("");
   const [monograma, setMonograma] = useState("");
@@ -94,6 +94,10 @@ function Measure() {
   const [fornecedor, setFornecedor] = useState("");
   const [rows, setRows] = useState([]);
   const [clearMonograma, setClearMonograma] = useState(false);
+
+  const generateId = (currentId) => {
+    return currentId + 1;
+  };
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -350,8 +354,8 @@ function Measure() {
     }
     setter(numericValue);
   };
-  const handleIdChange = (i) => {
-    setId(i.target.value);
+  const handleIdChange = (e) => {
+    setId(e.target.value);
   };
   const handleDateChange = (event) => {
     setInputDate(event.target.value);
@@ -441,8 +445,8 @@ function Measure() {
   const handleTypePenseChange = (e) => {
     setTypePense(e.target.value);
   };
-  const handleDescriptionChange = (i) => {
-    setDescription(i.target.value);
+  const handleDescriptionChange = (e) => {
+    setDescription(e.target.value);
   };
   const validateFields = () => {
     console.log("Vendedor", vendedor);
@@ -576,6 +580,14 @@ function Measure() {
     return true;
   };
 
+  console.log("Descrição enviada para o ModalMeasure:", description);
+  console.log("ID antes de abrir o modal:", id);
+  useEffect(() => {
+    if (!id) {
+      setId(generateId()); // Gerar um id ou buscar de alguma API
+    }
+  }, [id]);
+
   return (
     <>
       <div className="containerTypeMeasure">
@@ -605,9 +617,8 @@ function Measure() {
               <input
                 className="for-Inputs"
                 type="text"
-                // value={id}
-                // onChange={handleIdChange}
-                readOnly
+                value={id}
+                onChange={handleIdChange}
               />
             </section>
           </header>
@@ -1216,6 +1227,7 @@ function Measure() {
             setRows={setRows}
           ></ModalSelect>
         </form>
+
         <ModalMeasure
           openMeasure={openMeasure}
           setOpenMeasure={setOpenMeasure}
