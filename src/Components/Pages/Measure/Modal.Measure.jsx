@@ -3,82 +3,50 @@ import LogoCotovia from "../../AssetsIcons/cotovia.png";
 import "../Measure/Modal.Measure.css";
 import { useNavigate } from "react-router-dom";
 
-const ModalMeasure = (props) => {
-  const {
-    openMeasure,
-    setOpenMeasure,
-    rows, // rows precisa ser tratado corretamente
-    setRows,
-    cpf,
-    colar,
-    pala,
-    manga,
-    cintura,
-    quadril,
-    cumprimento,
-    biceps,
-    antebraco,
-    punhoEsquerdo,
-    punhoDireito,
-    torax,
-    extraRigido,
-    barbatana,
-    modelColar,
-    vendedor,
-    id,
-    inputDate,
-    deliveryDate,
-    metersTissue,
-    monograma,
-    modelFish,
-    typeFront,
-    typeModel,
-    typePense,
-    description = "",
-  } = props;
-
-  const [localDescription, setLocalDescription] = useState(description || "");
+const ModalMeasure = ({
+  openMeasure,
+  setOpenMeasure,
+  rows,
+  setRows,
+  cpf,
+  colar,
+  pala,
+  manga,
+  cintura,
+  quadril,
+  cumprimento,
+  biceps,
+  antebraco,
+  punhoEsquerdo,
+  punhoDireito,
+  torax,
+  extraRigido,
+  barbatana,
+  modelColar,
+  vendedor,
+  id,
+  inputDate,
+  deliveryDate,
+  metersTissue,
+  monograma,
+  modelFish,
+  typeFront,
+  typeModel,
+  typePense,
+  description = "", // Valor inicial da descrição
+}) => {
+  const [localDescription, setLocalDescription] = useState(description); // Inicializa com a descrição passada
   const navigate = useNavigate();
 
+  // Carregar a descrição apenas da prop 'description' (sem uso do localStorage)
   useEffect(() => {
     if (!openMeasure) return;
 
-    // Verifica se os dados estão no localStorage e os recupera
-    const savedRows = localStorage.getItem("rows");
-    const savedDescription = localStorage.getItem("localDescription");
+    setLocalDescription(description || ""); // Garantir que, caso não tenha descrição, use uma string vazia
+  }, [openMeasure, description]);
 
-    if (savedRows) {
-      setRows(JSON.parse(savedRows));
-    }
-    if (savedDescription) {
-      setLocalDescription(savedDescription);
-    }
-  }, [openMeasure, setRows]);
-
-  const API_URL = "https://tales-cotovia.onrender.com"; // URL do servidor Render
-
-  const handlePrint = () => {
-    const originalBody = document.body.innerHTML;
-    try {
-      const modalContent = document.querySelector(".modal").innerHTML;
-      document.body.innerHTML = modalContent;
-      window.print();
-    } finally {
-      document.body.innerHTML = originalBody;
-    }
-  };
-
+  // Função para enviar o e-mail com os dados do pedido
   const handleSendEmail = async () => {
-    const requiredFields = { cpf, colar, pala, manga };
-    const missingFields = Object.entries(requiredFields)
-      .filter(([_, value]) => !value)
-      .map(([key]) => key);
-
-    if (missingFields.length) {
-      alert(`Campos obrigatórios ausentes: ${missingFields.join(", ")}`);
-      return;
-    }
-
     const emailData = {
       cpf,
       colar,
@@ -105,28 +73,27 @@ const ModalMeasure = (props) => {
       typeFront,
       typeModel,
       typePense,
-      description: localDescription,
+      description: localDescription, // Passa a descrição atualizada
     };
 
-    console.log("Dados que estão sendo enviados:", emailData);
-
     try {
-      const response = await fetch(`${API_URL}/send-email`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(emailData),
-      });
+      const response = await fetch(
+        "https://tales-cotovia.onrender.com/send-email",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(emailData),
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
-        console.log("E-mail enviado com sucesso:", data);
         alert("E-mail enviado com sucesso!");
         setOpenMeasure(false);
       } else {
-        console.error("Erro do servidor:", data.message);
         alert(`Erro ao enviar e-mail: ${data.message || "Erro desconhecido"}`);
       }
     } catch (error) {
@@ -135,33 +102,29 @@ const ModalMeasure = (props) => {
     }
   };
 
-  const handleCloseModal = () => {
-    // Salva os dados no localStorage antes de navegar
-    localStorage.setItem("rows", JSON.stringify(rows));
-    localStorage.setItem("localDescription", localDescription);
-
-    setRows(rows); // Mantém os dados no estado
-    setOpenMeasure(false); // Fecha o modal
-
-    // Navega para a página de measure
-    navigate("/measure");
+  // Função para imprimir o conteúdo do modal
+  const handlePrint = () => {
+    const originalBody = document.body.innerHTML;
+    try {
+      const modalContent = document.querySelector(".modal").innerHTML;
+      document.body.innerHTML = modalContent;
+      window.print();
+    } finally {
+      document.body.innerHTML = originalBody;
+    }
   };
 
-  const renderRowDetails = () => {
-    if (rows && typeof rows === "object" && !Array.isArray(rows)) {
-      const rowEntries = Object.entries(rows);
-      return (
-        <div className="_wrapper-InfoDescription">
-          {rowEntries.map(([key, value]) => (
-            <p key={key}>
-              {key}: <strong>{value || "N/A"}</strong>
-            </p>
-          ))}
-        </div>
-      );
-    } else {
-      return <p>Informações de produto não disponíveis</p>;
-    }
+  // Função para fechar o modal
+  const handleCloseModal = () => {
+    setRows(rows);
+    setOpenMeasure(false);
+    navigate("/"); // Navega para a página de measure
+  };
+
+  // Atualiza o valor de 'localDescription' quando o usuário digita no textarea
+  const handleDescriptionChange = (e) => {
+    const updatedDescription = e.target.value;
+    setLocalDescription(updatedDescription);
   };
 
   if (!openMeasure) return null;
@@ -169,14 +132,17 @@ const ModalMeasure = (props) => {
   return (
     <div className="modal">
       <div>
+        {/* Header */}
         <section className="_navModalMeasure">
           <img src={LogoCotovia} alt="Logo Cotovia" />
         </section>
 
+        {/* Título */}
         <section className="text-titlle">
-          <h1>"Ficha Técnica do Pedido"</h1>
+          <h1>Ficha Técnica do Pedido</h1>
         </section>
 
+        {/* Informações do Cliente e Pedido */}
         <div className="sectorClientSuplier">
           <section className="_sectionClient">
             <p>
@@ -205,6 +171,7 @@ const ModalMeasure = (props) => {
           </section>
         </div>
 
+        {/* Medidas Personalizadas */}
         <div className="sectorPersonalized">
           <section className="_firstLeft-MeasureDate">
             <p>
@@ -252,7 +219,7 @@ const ModalMeasure = (props) => {
               Monograma: <strong>{monograma}</strong>
             </p>
             <p>
-              Rigido: <strong>{extraRigido}</strong>
+              Rígido: <strong>{extraRigido}</strong>
             </p>
             <p>
               Barbatana: <strong>{barbatana}</strong>
@@ -269,27 +236,26 @@ const ModalMeasure = (props) => {
           </section>
         </div>
 
+        {/* Área para descrição */}
         <div className="_wrapperModArea">
           <textarea
             name="Importante"
             id="important"
             value={localDescription}
-            onChange={(e) => setLocalDescription(e.target.value)}
+            onChange={handleDescriptionChange} // Atualiza a descrição com o valor digitado
           />
         </div>
 
+        {/* Botões */}
         <div className="sectorBotton">
           <section className="_wrapper-divFooter">
             <div className="areaButton">
               <button onClick={handleSendEmail}>Enviar E-mail</button>
-              <button onClick={handlePrint}>Emprimir</button>
+              <button onClick={handlePrint}>Imprimir</button>
               <button onClick={handleCloseModal}>Voltar</button>
             </div>
           </section>
         </div>
-
-        {/* Renderizar detalhes da linha */}
-        {renderRowDetails()}
       </div>
     </div>
   );

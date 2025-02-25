@@ -3,6 +3,14 @@
   padding: 0;
   box-sizing: border-box;
 }
+:root {
+  --primary-color: #0178c7;
+  --secondary-color: #19a152;
+  --text-color: #333;
+  --background-color: #f4f4f4;
+  --button-houver-color: #208048;
+  --button-sair-color: #ccc;
+}
 p {
   display: flex;
   width: 100%;
@@ -155,12 +163,15 @@ h2 {
 .areaButton button {
   font-size: 10px;
 }
+._wrapper-divFooter .areaButton button:nth-of-type(2) {
+  background-color: var(--primary-color);
+}
 ._wrapper-divFooter .areaButton button:nth-of-type(3) {
-  background-color: yellow;
+  background-color: var(--button-sair-color);
   color: black;
 }
 ._wrapper-divFooter .areaButton button:nth-of-type(3):hover {
-  background-color: rgb(226, 226, 15);
+  background-color: #acabab;
 }
 
 ._containnerModalMeasure {
@@ -194,14 +205,55 @@ h2 {
 ._all-Tissue section {
   display: flex;
 }
-._wrapper-InfoDescription {
+
+/* ._wrapper-InfoDescription {
   display: flex;
   width: 100%;
-  justify-content: center;
-  /* background-color: magenta; */
+  justify-content: center; 
   margin-top: 20px;
   gap: 20px;
+} */
+
+._wrapper-InfoDescription {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Reduzimos o gap entre as linhas */
+  padding: 20px;
 }
+
+._header-row {
+  display: flex;
+  gap: 15px; /* Menos espaçamento entre os rótulos */
+  font-weight: bold;
+  padding-bottom: 8px;
+}
+
+._row-details {
+  display: flex;
+  gap: 15px; /* Menos espaçamento entre as colunas */
+  border: 1px solid #ddd;
+  padding: 8px; /* Menos padding, deixando tudo mais próximo */
+  border-radius: 5px;
+  align-items: center;
+}
+
+._row-details .detail-item {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+._row-details p {
+  margin: 0;
+  width: 100%; /* Garante que as descrições ocuparam o mesmo espaço */
+}
+
+._row-details .detail-item p {
+  margin: 0;
+  text-align: left;
+}
+
 ._wrapper-InfoDescription strong {
   margin-left: 5px;
 }
