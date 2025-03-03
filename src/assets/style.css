@@ -1,0 +1,104 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+.TitlleAlfaiatariaCotovia {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 20px;
+  background-color: black;
+  border: 1px solid black;
+  color: white;
+}
+
+._dataClientColumnOne div p {
+  margin: 2px 0; /* Reduz a margem superior e inferior */
+  padding: 0; /* Remove qualquer espaçamento interno */
+  line-height: 1.5; /* Ajusta a altura da linha para ficar mais compacta */
+}
+
+._dataClientColumnOne {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  margin: 0;
+  margin-top: 7px;
+  margin-bottom: 7px;
+  gap: 10px;
+}
+
+/* Aplicando estilos iguais para os dois blocos */
+._dataClientColumnOne div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centraliza o conteúdo verticalmente */
+  align-items: flex-start; /* Mantém o alinhamento à esquerda */
+  width: 100%;
+  border: 1px solid black;
+  padding: 10px;
+  box-sizing: border-box; /* Evita que o padding aumente o tamanho do elemento */
+}
+._dataMeasureColumnTwo div p {
+  margin: 2px 0; /* Reduz a margem superior e inferior */
+  padding: 0; /* Remove qualquer espaçamento interno */
+  line-height: 1.5; /* Ajusta a altura da linha para ficar mais compacta */
+}
+
+._dataMeasureColumnTwo {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Divide em duas colunas */
+  width: 100%;
+  margin: 7px 0;
+  gap: 10px;
+}
+
+._dataMeasureColumnTwo section {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Alinha os itens no topo */
+  align-items: flex-start; /* Alinha os itens à esquerda */
+  width: 100%;
+  border: 1px solid black;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+._areaTextCescrition {
+  width: 100%;
+  height: 100%;
+  margin-top: 7px;
+  margin-bottom: 7px;
+}
+
+._areaTextCescrition section {
+  width: 100%;
+  height: 180px;
+  border: 1px solid black;
+}
+._areaTextCescrition section p {
+  margin: 2px 0;
+  padding: 10px;
+  line-height: 1.5;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}

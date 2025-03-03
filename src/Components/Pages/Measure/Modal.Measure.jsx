@@ -73,20 +73,18 @@ const ModalMeasure = ({
       typeFront,
       typeModel,
       typePense,
-      description: localDescription, // Passa a descrição atualizada
+      description: localDescription,
+      rows,
     };
 
     try {
-      const response = await fetch(
-        "https://tales-cotovia.onrender.com/send-email",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(emailData),
-        }
-      );
+      const response = await fetch("http://localhost:5000/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(emailData),
+      });
 
       const data = await response.json();
 
