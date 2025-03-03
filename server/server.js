@@ -1,105 +1,120 @@
+require("dotenv").config();
 const express = require("express");
-require("dotenv").config(); // Carrega as variáveis de ambiente do .env
-const PDFDocument = require("pdfkit");
 const nodemailer = require("nodemailer");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
+const handlebars = require("handlebars");
+const puppeteer = require("puppeteer"); // Adiciona puppeteer
 const cors = require("cors");
 
 const app = express();
+const port = process.env.PORT || 5000;
+
 app.use(express.json());
-app.use(cors()); // Permite requisições do front-end
+app.use(cors());
 
-// Configuração do transporte de e-mail
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER, // Configure no .env
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false, // Desabilita o erro de "SSL certificate" (caso ocorra)
-  },
-});
+// Configuração do Multer para upload de arquivos
+const upload = multer({ dest: "uploads/" });
 
-app.post("/send-email", async (req, res) => {
-  const emailData = req.body;
+// Criar diretório uploads se não existir
+const uploadPath = "./uploads";
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath);
+}
 
-  if (
-    !emailData.cpf ||
-    !emailData.colar ||
-    !emailData.pala ||
-    !emailData.manga
-  ) {
-    return res
-      .status(400)
-      .json({ message: "Campos obrigatórios estão ausentes." });
+// Função para gerar PDF a partir de dados e template HTML usando Puppeteer
+const generatePdfWithPuppeteer = async (data) => {
+  const browser = await puppeteer.launch({ headless: true, timeout: 60000 }); // Lançar o Puppeteer em modo headless com timeout aumentado
+  const page = await browser.newPage();
+
+  // Verificar o caminho do template HTML
+  const htmlTemplatePath = path.join(
+    __dirname,
+    "..",
+    "src",
+    "assets",
+    "tabela.html"
+  );
+
+  if (!fs.existsSync(htmlTemplatePath)) {
+    throw new Error("Arquivo de template HTML não encontrado!");
   }
 
-  // Criando o documento PDF
-  const doc = new PDFDocument();
-  let buffers = [];
+  // Carregar o template HTML
+  const htmlTemplate = fs.readFileSync(htmlTemplatePath, "utf-8");
+  const template = handlebars.compile(htmlTemplate);
 
-  doc.on("data", (chunk) => buffers.push(chunk));
-  doc.on("end", async () => {
-    const pdfData = Buffer.concat(buffers);
+  // Substituir os placeholders com os dados
+  const htmlContent = template(data);
 
+  // Carregar o conteúdo HTML na página
+  await page.setContent(htmlContent);
+  await page.setContent(htmlContent, { waitUntil: "domcontentloaded" });
+
+  // Gerar o PDF com as configurações necessárias
+  const pdfPath = `./uploads/pedido-${Date.now()}.pdf`;
+  await page.pdf({ path: pdfPath, format: "A4" });
+
+  await browser.close();
+
+  return pdfPath;
+};
+
+// Rota para gerar e enviar um e-mail com PDF
+app.post("/send-email", upload.none(), async (req, res) => {
+  try {
+    const emailData = req.body;
+
+    // Validação dos dados de entrada
+    if (!emailData || !emailData.cpf || !emailData.description) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Dados inválidos." });
+    }
+
+    // Gerar o PDF com Puppeteer
+    const pdfPath = await generatePdfWithPuppeteer(emailData); // Gera o PDF com Puppeteer
+    console.log("PDF Gerado em:", pdfPath);
+
+    // Configuração do transporter para envio de e-mail
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    // Definição das opções do e-mail
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: "roger.ngt3494@gmail.com",
-      subject: `Cliente / Pedido por CPF: ${emailData.cpf}`,
-      text: "Segue em anexo os dados do pedido.",
+      to: "roger.ngt3494@gmail.com", // ou adicione mais destinatários
+      subject: `Novo Pedido - Cliente ${emailData.cpf}`,
+      text: `Pedido do cliente ${emailData.cpf} realizado com sucesso.`,
       attachments: [
         {
-          filename: `Pedido-${emailData.cpf}.pdf`,
-          content: pdfData, // Anexa o PDF no e-mail
-          contentType: "application/pdf",
+          filename: `pedido-${Date.now()}.pdf`, // Nome único para o PDF
+          path: pdfPath, // Caminho correto do PDF gerado
         },
       ],
     };
 
-    try {
-      const info = await transporter.sendMail(mailOptions);
-      console.log("✅ E-mail enviado com sucesso:", info.response);
-      res.status(200).json({ message: "E-mail enviado com sucesso!" });
-    } catch (error) {
-      console.error("❌ Erro ao enviar e-mail:", error);
-      res
-        .status(500)
-        .json({ message: "Erro ao enviar e-mail.", error: error.message });
-    }
-  });
+    // Enviar o e-mail com o PDF anexado
+    await transporter.sendMail(mailOptions);
+    console.log("E-mail enviado com sucesso para:", mailOptions.to);
 
-  // Adicionando conteúdo ao PDF
+    // Deletar o PDF após o envio
+    fs.unlinkSync(pdfPath);
 
-  doc
-    .fontSize(16)
-    .text("Dados do Pedido Cotovia", { align: "center" })
-    .moveDown();
-  doc.fontSize(12).text(`CPF: ${emailData.cpf}`);
-  doc.text(`Vendedor: ${emailData.vendedor}`);
-  doc.text(`Data do Pedido: ${emailData.inputDate}`);
-  doc.text(`Data da Entrega: ${emailData.deliveryDate}`);
-  doc.text(`Colar: ${emailData.colar}`);
-  doc.text(`Pala: ${emailData.pala}`);
-  doc.text(`Manga: ${emailData.manga}`);
-  doc.text(`Torax: ${emailData.torax}`);
-  doc.text(`Cintura: ${emailData.cintura}`);
-  doc.text(`Quadril: ${emailData.quadril}`);
-  doc.text(`Comprimento: ${emailData.cumprimento}`);
-  doc.text(`Bíceps: ${emailData.biceps}`);
-  doc.text(`Antebraço: ${emailData.antebraco}`);
-  doc.text(`Punho Esq.: ${emailData.punhoEsquerdo}`);
-  doc.text(`Punho Dir.: ${emailData.punhoDireito}`);
-  doc.text(`Extra Rigido: ${emailData.extraRigido}`);
-  doc.text(`Barbatana: ${emailData.barbatana}`);
-  doc.text(`Monograma: ${emailData.monograma}`);
-  doc.text(`Modelo: ${emailData.typeModel}`);
-  doc.text(`Pense: ${emailData.typePense}`);
-  doc.text(`Mensagem: ${emailData.description}`);
-
-  doc.end();
+    res.json({ success: true, message: "E-mail enviado com sucesso!" });
+  } catch (error) {
+    console.error("Erro ao enviar e-mail:", error);
+    res.status(500).json({ success: false, message: "Erro ao enviar e-mail." });
+  }
 });
 
-// 🚀 Ouvindo a porta
-app.listen(process.env.PORT || 3000, () =>
-  console.log(`🚀 Servidor rodando na porta ${process.env.PORT || 3000}`)
-);
+// Iniciar servidor
+app.listen(port, () => {
+  console.log(`Servidor rodando na porta ${port}`);
+});

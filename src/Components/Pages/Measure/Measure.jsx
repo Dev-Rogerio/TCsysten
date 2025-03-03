@@ -94,6 +94,9 @@ function Measure() {
   const [fornecedor, setFornecedor] = useState("");
   const [rows, setRows] = useState([]);
   const [clearMonograma, setClearMonograma] = useState(false);
+  const [localDescription, setLocalDescription] = useState("");
+  const [clientCpf, setClientCpf] = useState("");
+  const [clientDescription, setClientDescription] = useState("");
 
   const generateId = (currentId) => {
     return currentId + 1;
@@ -160,9 +163,11 @@ function Measure() {
     // setCpf(event.target.value);
     setCpf(event.target.value);
   };
+
   // const handlePrint = () => {
   //   window.print();
   // };
+
   const handleLimparFormulario = () => {
     setCpf("");
     setCliente({});
@@ -199,54 +204,6 @@ function Measure() {
     return true;
   };
 
-  //
-  // Função para gerar o PDF
-  const generatePDF = () => {
-    const doc = new jsPDF();
-
-    doc.text("Informações do Pedido", 20, 20);
-    doc.text(`Modelo de Peixe: ${formData.modelFish}`, 20, 30);
-    doc.text(`Tipo de Frente: ${formData.typeFront}`, 20, 40);
-    doc.text(`Barbatana: ${formData.barbatana}`, 20, 50);
-    doc.text(`Modelo: ${formData.typeModel}`, 20, 60);
-    doc.text(`Pense: ${formData.typePense}`, 20, 70);
-    doc.text(`Extra Rígido: ${formData.extraRigido}`, 20, 80);
-    doc.text(`MTRS/TEC.: ${formData.metersTissue}`, 20, 90);
-    doc.text(`Monograma: ${formData.monograma}`, 20, 100);
-    doc.text(`Observações: ${formData.description}`, 20, 110);
-
-    // Gera o PDF em memória
-    const pdfBlob = doc.output("blob");
-
-    // Cria um arquivo real antes de anexar ao FormData
-    const pdfFile = new File([pdfBlob], "pedido.pdf", {
-      type: "application/pdf",
-    });
-
-    // Aqui você pode enviar o PDF por e-mail
-    sendEmailWithPDF(pdfBlob);
-  };
-
-  // Função para enviar o e-mail com o PDF
-  const sendEmailWithPDF = (pdfBlob) => {
-    const formData = new FormData();
-    const pdfFile = new File([pdfBlob], "pedido.pdf", {
-      type: "application/pdf",
-    });
-
-    formData.append("pdf", pdfFile);
-
-    // Supondo que você tenha uma rota no backend que lida com o envio de e-mails
-    fetch("https://tales-cotovia.onrender.com/send-email", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => console.log("Email enviado com sucesso", data))
-      .catch((error) => console.error("Erro ao enviar e-mail:", error));
-  };
-  //
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -264,8 +221,6 @@ function Measure() {
       setShowModal(true);
       return; // Para a execução caso o CPF seja inválido
     }
-
-    // Validação de outras partes do formulário, caso necessário
 
     // Ações após passar todas as validações
     console.log("Formulário enviado com sucesso!");
@@ -310,16 +265,13 @@ function Measure() {
 
     // Enviar os dados para o servidor
     try {
-      const response = await fetch(
-        "https://tales-cotovia.onrender.com/send-email",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await fetch("http://localhost:5000/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
       const result = await response.json();
       console.log(result); // Verifique a resposta do servidor no console
@@ -343,6 +295,7 @@ function Measure() {
   const handleVendedorChange = (e) => {
     setVendedor(e.target.value);
   };
+
   const closeModal = () => {
     setShowModal(false);
   };
@@ -588,6 +541,81 @@ function Measure() {
     }
   }, [id]);
 
+  const [pdfFile, setPdfFile] = useState(null); // Estado para armazenar o arquivo
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0]; // Obtém o primeiro arquivo selecionado
+    console.log("Arquivo PDF anexado:", file);
+    setPdfFile(file); // Armazena o arquivo no estado
+  };
+
+  // const handleSendEmail = async () => {
+  //   const formData = new FormData();
+
+  //   // Adicionando os dados do pedido (dados adicionais, como cpf, colar, etc.)
+  //   formData.append(
+  //     "data",
+  //     JSON.stringify({
+  //       cpf,
+  //       colar,
+  //       pala,
+  //       manga,
+  //       cintura,
+  //       quadril,
+  //       cumprimento,
+  //       biceps,
+  //       antebraco,
+  //       punhoEsquerdo,
+  //       punhoDireito,
+  //       torax,
+  //       extraRigido,
+  //       barbatana,
+  //       modelColar,
+  //       vendedor,
+  //       id,
+  //       inputDate,
+  //       deliveryDate,
+  //       metersTissue,
+  //       monograma,
+  //       modelFish,
+  //       typeFront,
+  //       typeModel,
+  //       typePense,
+  //       description: localDescription,
+  //     })
+  //   );
+
+  //   const pdfInput = document.getElementById("pdfFile");
+  //   if (pdfFile) {
+  //     formData.append("pdfFile", pdfFile);
+  //   }
+
+  //   console.log("Arquivo PDF anexado:", pdfFile);
+  //   if (pdfFile) {
+  //     formData.append("pdfFile", pdfFile);
+  //   }
+
+  //   try {
+  //     const response = await fetch("http://localhost:5000/send-email", {
+  //       method: "POST",
+  //       body: formData, // Enviando FormData com JSON e PDF
+  //     });
+
+  //     const result = await response.json();
+
+  //     if (response.ok) {
+  //       alert("E-mail enviado com sucesso!");
+  //     } else {
+  //       alert(
+  //         `Erro ao enviar e-mail: ${result.message || "Erro desconhecido"}`
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error("Erro ao enviar o e-mail:", error);
+  //     alert("Ocorreu um erro ao tentar enviar o e-mail.");
+  //   }
+  // };
+
   return (
     <>
       <div className="containerTypeMeasure">
@@ -601,6 +629,7 @@ function Measure() {
             <section>
               <p className="for-text">VENDEDOR:</p>
               <input
+                id="pdfFile"
                 className="for-Inputs"
                 type="text"
                 value={vendedor}
@@ -628,20 +657,11 @@ function Measure() {
               <section>
                 <p className="for-text">CPF:</p>
                 <input
-                  mask="999.999.999-99"
                   type="text"
+                  mask="999.999.999-99"
                   className="for-Inputs"
                   value={cpf}
                   onChange={handleCpfChange}
-                />
-              </section>
-
-              <section>
-                <p className="for-text">CONTATO:</p>
-                <input
-                  type="text"
-                  className="for-Inputs"
-                  // value={contato}
                 />
               </section>
 
@@ -651,7 +671,17 @@ function Measure() {
                   type="text"
                   className="for-Inputs"
                   // value={cliente ? cliente.nome : ''}
+                  value={cliente}
                   readOnly
+                />
+              </section>
+
+              <section>
+                <p className="for-text">CONTATO:</p>
+                <input
+                  type="text"
+                  className="for-Inputs"
+                  // value={contato}
                 />
               </section>
 
@@ -969,6 +999,7 @@ function Measure() {
                       className="_secImput-radio "
                       type="radio"
                       value="Lisa"
+                      accept=".pdf"
                       checked={typeFront === "Lisa"}
                       onChange={handleTypeFrontChange}
                     />
@@ -981,6 +1012,7 @@ function Measure() {
                       className="_secImput-radio"
                       type="radio"
                       value="Embutida"
+                      accept=".pdf"
                       checked={typeFront === "Embutida"}
                       onChange={handleTypeFrontChange}
                     />
