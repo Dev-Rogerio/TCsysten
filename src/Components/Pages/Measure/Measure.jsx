@@ -92,7 +92,14 @@ function Measure() {
   const [codTextil, setCodTextil] = useState("");
   const [texture, setTexture] = useState("");
   const [fornecedor, setFornecedor] = useState("");
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState([
+    {
+      codTextil: "",
+      codProduct: "",
+      texture: "",
+      fornecedor: "",
+    },
+  ]);
   const [clearMonograma, setClearMonograma] = useState(false);
   const [localDescription, setLocalDescription] = useState("");
   const [clientCpf, setClientCpf] = useState("");

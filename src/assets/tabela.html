@@ -174,12 +174,14 @@
         </tr>
       </thead>
       <tbody>
+        {{#each rows}}
         <tr>
-          <td>{{row.codTextil}}</td>
-          <td>{{row.codProduct}}</td>
-          <td>{{row.texture}}</td>
-          <td>{{row.fornecedor}}</td>
+          <td>{{this.codTextil}}</td>
+          <td>{{this.codProduct}}</td>
+          <td>{{this.texture}}</td>
+          <td>{{this.fornecedor}}</td>
         </tr>
+        {{/each}}
       </tbody>
     </table>
   </body>
