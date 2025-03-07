@@ -150,9 +150,8 @@ function Measure() {
 
   const fetchClientData = async (cpf) => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/clienttable?cpf=${cpf}`
-      );
+      // const response = await axios.get(`http://localhost:3000/clienttable?cpf=${cpf}`);
+      const response = await axios.get(`${API_URL}/clienttable?cpf=${cpf}`);
       if (response.data && response.data.length > 0) {
         const clientData = response.data[0];
         setCliente(clientData);
@@ -273,10 +272,10 @@ function Measure() {
       typePense,
     };
 
-    // const API_URL =
-    //   process.env.NODE_ENV === "production"
-    //     ? "https://tales-cotovia.onrender.com/send-email"
-    //     : "http://localhost:5000/send-email";
+    const API_URL =
+      process.env.NODE_ENV === "production"
+        ? "https://tales-cotovia.onrender.com"
+        : "http://localhost:5000/send-email";
 
     // Enviar os dados para o servidor
     try {
