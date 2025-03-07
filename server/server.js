@@ -8,11 +8,17 @@ const handlebars = require("handlebars");
 const puppeteer = require("puppeteer"); // Adiciona puppeteer
 const cors = require("cors");
 
+// Configuração do CORS para permitir requisições de qualquer origem
+const corsOptions = {
+  origin: "*", // Permite requisições de qualquer origem
+  methods: ["GET", "POST", "PUT", "DELETE"], // Permite os métodos necessários
+};
+
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 
 // Configuração do Multer para upload de arquivos
 const upload = multer({ dest: "uploads/" });
