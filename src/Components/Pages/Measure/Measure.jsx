@@ -280,13 +280,16 @@ function Measure() {
 
     // Enviar os dados para o servidor
     try {
-      const response = await fetch("https://tales-cotovia.onrender.com", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        "https://tales-cotovia.onrender.com/send-email",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
       const result = await response.json();
       console.log(result); // Verifique a resposta do servidor no console
