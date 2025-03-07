@@ -18,34 +18,11 @@ const ModalSelect = ({ openSelect = false, rows, setRows }) => {
     }
   }, []); // Array vazio faz com que rode apenas uma vez ao montar o componente
 
-  // useEffect(() => {
-  //   // seu código
-  // }, [addRow]); // Adicionando addRow nas dependências
-
-  // useEffect(() => {
-  //   if (!Array.isArray(rows) || rows.length === 0) {
-  //     addRow();
-  //   }
-  // }, [rows, addRow]); // Agora `addRow` é estável e o warning some
-  // // Garante pelo menos uma linha inicial no formulário
-  // useEffect(() => {
-  //   if (!Array.isArray(rows) || rows.length === 0) {
-  //     addRow();
-  //   }
-  // }, [rows]);
-
   const handleInputChange = (index, field, value) => {
     const updatedRows = [...rows];
     updatedRows[index][field] = value;
     setRows(updatedRows);
   };
-
-  // const addRow = () => {
-  //   setRows([
-  //     ...rows,
-  //     { codTextil: "", codProduct: "", texture: "", fornecedor: "" },
-  //   ]);
-  // };
 
   const removeRow = (index) => {
     if (rows.length > 1) {

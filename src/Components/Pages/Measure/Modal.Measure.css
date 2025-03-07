@@ -91,6 +91,10 @@ h2 {
   border: 1px solid #ccc;
   margin: 0;
 }
+
+._sectionClient p {
+  text-transform: capitalize;
+}
 ._sectionDateInfo {
   grid-column: 2;
   grid-row: 1;
@@ -144,6 +148,13 @@ h2 {
   grid-column: 2;
   grid-row: 1;
   border: 1px solid #ccc;
+}
+
+_secondRight-MeasureDate p:nth-of-type(2) {
+  text-transform: capitalize;
+}
+._secondRight-MeasureDate p:nth-child(4) {
+  text-transform: capitalize;
 }
 
 ._wrapperModArea {
@@ -270,6 +281,14 @@ h2 {
   font-size: 1em;
   text-align: left;
   /* background-color: yellowgreen; */
+}
+
+table thead tr th {
+  font-size: 12px;
+}
+
+table tbody tr td {
+  font-size: 12px;
 }
 td {
   /* border:  1px solid #ddd; */

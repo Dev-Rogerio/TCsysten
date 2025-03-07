@@ -4,6 +4,8 @@ import axios from "axios";
 import { redirectDocument, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
+import VMasker from "vanilla-masker";
+
 import Colarinho from "../../AssetsIcons/typeColarinho.png";
 import Duplo from "../../AssetsIcons/duplo.png";
 import Redondo from "../../AssetsIcons/redondo.png";
@@ -28,7 +30,7 @@ function calculateDeliveryDate(date) {
 function Measure() {
   const [dadosCliente, setDadosCliente] = useState(null);
   const [cpf, setCpf] = useState("");
-  const [cliente, setCliente] = useState(null);
+  const [cliente, setCliente] = useState("");
   const location = useLocation();
   const [contato, setContato] = useState("");
   const [error, setError] = useState("");
@@ -166,14 +168,16 @@ function Measure() {
       setContato("");
     }
   };
-  const handleCpfChange = (event) => {
-    // setCpf(event.target.value);
-    setCpf(event.target.value);
+  const handleCpfMaskedChange = (e) => {
+    const rawValue = e.target.value.replace(/\D/g, ""); // Remove tudo que não for número
+    const maskedValue = VMasker.toPattern(rawValue, "999.999.999-99");
+    setCpf(maskedValue);
   };
 
-  // const handlePrint = () => {
-  //   window.print();
-  // };
+  const handleBlurCpf = () => {
+    // Quando o campo perder o foco, aplica a máscara
+    setCpf(VMasker.toPattern(cpf, "999.999.999-99"));
+  };
 
   const handleLimparFormulario = () => {
     setCpf("");
@@ -229,16 +233,15 @@ function Measure() {
       return; // Para a execução caso o CPF seja inválido
     }
 
+    if (!client.trim()) {
+      setErroMessage("O Campo Cliente esta vazio");
+      setShowModal(true);
+      return;
+    }
+
     // Ações após passar todas as validações
     console.log("Formulário enviado com sucesso!");
 
-    // Preparar os dados para enviar ao servidor
-    // const data = {
-    //   cpf,
-    //   description, // Suponho que você tenha uma variável 'description' no seu formulário
-    //   measurements, // Suponho que você tenha uma variável 'measurements' com as medidas
-    //   rows, // As linhas de itens adicionais
-    // };
     console.log("Dados enviados:", data);
 
     const data = {
@@ -257,17 +260,17 @@ function Measure() {
         punhoEsquerdo,
         punhoDireito,
       },
-      vendedor, // Dados do vendedor
-      deliveryDate, // Data de entrega
-      metersTissue, // Medida de tecido
-      monograma, // Monograma
-      modelFish, // Modelo de peixe
-      typeFront, // Tipo de frente
-      typeModel, // Tipo de modelo
-      extraRigido, // Extra rígido
-      barbatana, // Barbatana
-      modelColar, // Modelo de colar
-      typePense, // Tipo de pense
+      vendedor,
+      deliveryDate,
+      metersTissue,
+      monograma,
+      modelFish,
+      typeFront,
+      typeModel,
+      extraRigido,
+      barbatana,
+      modelColar,
+      typePense,
     };
 
     // Enviar os dados para o servidor
@@ -301,6 +304,10 @@ function Measure() {
 
   const handleVendedorChange = (e) => {
     setVendedor(e.target.value);
+  };
+
+  const handleClientChange = (e) => {
+    setClient(e.target.value);
   };
 
   const closeModal = () => {
@@ -400,6 +407,7 @@ function Measure() {
     setTypeModel(e.target.value);
   };
   const handleTypeFrontChange = (e) => {
+    console.log("Valor de typeFront:", e.target.value);
     setTypeFront(e.target.value);
   };
   const handleTypePenseChange = (e) => {
@@ -422,6 +430,13 @@ function Measure() {
       setShowModal(true);
       return false;
     }
+
+    if (!client.trim()) {
+      setErroMessage("O Campo Cliente está vazio");
+      setShowModal(true);
+      return;
+    }
+
     if (!inputDate.trim()) {
       setErrorMessage("Informe uma DATA!");
       setShowModal(true);
@@ -556,73 +571,6 @@ function Measure() {
     setPdfFile(file); // Armazena o arquivo no estado
   };
 
-  // const handleSendEmail = async () => {
-  //   const formData = new FormData();
-
-  //   // Adicionando os dados do pedido (dados adicionais, como cpf, colar, etc.)
-  //   formData.append(
-  //     "data",
-  //     JSON.stringify({
-  //       cpf,
-  //       colar,
-  //       pala,
-  //       manga,
-  //       cintura,
-  //       quadril,
-  //       cumprimento,
-  //       biceps,
-  //       antebraco,
-  //       punhoEsquerdo,
-  //       punhoDireito,
-  //       torax,
-  //       extraRigido,
-  //       barbatana,
-  //       modelColar,
-  //       vendedor,
-  //       id,
-  //       inputDate,
-  //       deliveryDate,
-  //       metersTissue,
-  //       monograma,
-  //       modelFish,
-  //       typeFront,
-  //       typeModel,
-  //       typePense,
-  //       description: localDescription,
-  //     })
-  //   );
-
-  //   const pdfInput = document.getElementById("pdfFile");
-  //   if (pdfFile) {
-  //     formData.append("pdfFile", pdfFile);
-  //   }
-
-  //   console.log("Arquivo PDF anexado:", pdfFile);
-  //   if (pdfFile) {
-  //     formData.append("pdfFile", pdfFile);
-  //   }
-
-  //   try {
-  //     const response = await fetch("http://localhost:5000/send-email", {
-  //       method: "POST",
-  //       body: formData, // Enviando FormData com JSON e PDF
-  //     });
-
-  //     const result = await response.json();
-
-  //     if (response.ok) {
-  //       alert("E-mail enviado com sucesso!");
-  //     } else {
-  //       alert(
-  //         `Erro ao enviar e-mail: ${result.message || "Erro desconhecido"}`
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error("Erro ao enviar o e-mail:", error);
-  //     alert("Ocorreu um erro ao tentar enviar o e-mail.");
-  //   }
-  // };
-
   return (
     <>
       <div className="containerTypeMeasure">
@@ -630,7 +578,6 @@ function Measure() {
           <header className="_wrapper-header">
             <section>
               <img src={Site} alt="" />
-              {/* <img src="" alt="" /> */}
             </section>
 
             <section>
@@ -640,6 +587,7 @@ function Measure() {
                 className="for-Inputs"
                 type="text"
                 value={vendedor}
+                placeholder="Informe o vendedor"
                 onChange={handleVendedorChange}
               />
             </section>
@@ -663,12 +611,16 @@ function Measure() {
             <section className="wrapper-dataForm">
               <section>
                 <p className="for-text">CPF:</p>
+
                 <input
                   type="text"
-                  mask="999.999.999-99"
-                  className="for-Inputs"
+                  name="cpf"
                   value={cpf}
-                  onChange={handleCpfChange}
+                  onChange={handleCpfMaskedChange}
+                  placeholder="Digite o CPF"
+                  maxLength="14"
+                  // className="input-cpf"
+                  className="for-Inputs"
                 />
               </section>
 
@@ -677,9 +629,10 @@ function Measure() {
                 <input
                   type="text"
                   className="for-Inputs"
-                  // value={cliente ? cliente.nome : ''}
-                  value={cliente}
-                  readOnly
+                  placeholder="Informe o Nome"
+                  value={client}
+                  onChange={handleClientChange}
+                  // readOnly
                 />
               </section>
 
@@ -734,7 +687,6 @@ function Measure() {
               </section>
             </section>
           </main>
-
           <article className="_wrapper-article">
             <section className="wrapper-MeasureDatas">
               <section className="measures-datas">
@@ -852,13 +804,12 @@ function Measure() {
               </section>
             </section>
           </article>
-
           <aside className="_wrapper-aside">
             <section className="wrapper-asideCollar">
               <section className="_sec-colar">
                 <img src={Colarinho} alt="" />
                 <div className="_secInfoRadio">
-                  <label htmlFor="paris" className="for-text">
+                  <label htmlFor="italiano" className="for-text">
                     <input
                       type="radio"
                       id="italiano"
@@ -874,7 +825,7 @@ function Measure() {
               <section className="_sec-colar">
                 <img src={Colarinho} alt="" className="imgColarinho" />
                 <div className="_secInfoRadio">
-                  <label htmlFor="windsor" className="for-text">
+                  <label htmlFor="padre" className="for-text">
                     <input
                       type="radio"
                       id="padre"
@@ -887,7 +838,6 @@ function Measure() {
                   </label>
                 </div>
               </section>
-
               <section className="_sec-colar">
                 <img src={Colarinho} alt="" className="imgColarinho" />
                 <div className="_secInfoRadio">
@@ -904,7 +854,6 @@ function Measure() {
                   </label>
                 </div>
               </section>
-
               <section className="_sec-colar">
                 <img src={Colarinho} alt="" className="imgColarinho" />
                 <div className="_secInfoRadio">
@@ -921,7 +870,6 @@ function Measure() {
                   </label>
                 </div>
               </section>
-
               <section className="_sec-colar">
                 <img src={Colarinho} alt="" className="imgColarinho" />
                 <div className="_secInfoRadio">
@@ -940,7 +888,6 @@ function Measure() {
               </section>
             </section>
           </aside>
-
           <nav className="_wrapper-nav">
             <section className="wrapper-navCollar">
               <section className="_sec-punho">
@@ -949,6 +896,7 @@ function Measure() {
                   <label className="for-text" htmlFor="duplo">
                     <input
                       type="radio"
+                      id="duplo"
                       className="_secImput-radio"
                       value="Duplo"
                       checked={modelFish === "Duplo"}
@@ -958,12 +906,12 @@ function Measure() {
                   </label>
                 </div>
               </section>
-
               <section className="_sec-punho">
                 <img src={Redondo} alt="" className="_punho" />
                 <div className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="redondo" className="for-text">
                     <input
+                      id="redondo"
                       className="_secImput-radio"
                       type="radio"
                       value="Redondo"
@@ -974,12 +922,12 @@ function Measure() {
                   </label>
                 </div>
               </section>
-
               <section className="_sec-punho">
                 <img src={Chanfrado} alt="" className="_punho" />
                 <div className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="chanfrado" className="for-text">
                     <input
+                      id="chanfrado"
                       className="_secImput-radio"
                       type="radio"
                       value="Chanfrado"
@@ -992,17 +940,16 @@ function Measure() {
               </section>
             </section>
           </nav>
-
           <section className="_wrapper-section">
             <section className="_wrapper-sectionPersonalized">
               <section className="typeTextFront">
                 <p className="for-text">TIPO DE FRENTE</p>
               </section>
-
               <section className="boxTypePersinalized">
                 <div className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="lisa" className="for-text">
                     <input
+                      id="lisa"
                       className="_secImput-radio "
                       type="radio"
                       value="Lisa"
@@ -1014,8 +961,9 @@ function Measure() {
                   </label>
                 </div>
                 <div className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="embutida" className="for-text">
                     <input
+                      id="embutida"
                       className="_secImput-radio"
                       type="radio"
                       value="Embutida"
@@ -1027,8 +975,9 @@ function Measure() {
                   </label>
                 </div>
                 <div className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="macho" className="for-text">
                     <input
+                      id="macho"
                       className="_secImput-radio"
                       type="radio"
                       value="Macho"
@@ -1039,29 +988,28 @@ function Measure() {
                   </label>
                 </div>
                 <div className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="wa" className="for-text">
                     <input
+                      id="wa"
                       className="_secImput-radio"
                       type="radio"
                       value="WA"
                       checked={typeFront === "WA"}
                       onChange={handleTypeFrontChange}
                     />
-                    WA
+                    <span>WA</span>
                   </label>
                 </div>
               </section>
-
               <section className="typeTextBarbatana">
                 <p className="for-text">BARBATANA</p>
               </section>
-
               <section className="boxTypeBarbatana">
                 <div className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="barbatanaSim" className="for-text">
                     <input
                       type="radio"
-                      id="barbatana"
+                      id="barbatanaSim"
                       value="Sim"
                       checked={barbatana === "Sim"}
                       className="_secImput-radio"
@@ -1071,11 +1019,11 @@ function Measure() {
                   </label>
                 </div>
                 <div className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="barbatanaNao" className="for-text">
                     <input
                       type="radio"
                       className="_secImput-radio"
-                      id="barbatana"
+                      id="barbatanaNao"
                       value="Não"
                       checked={barbatana === "Não"}
                       onChange={handleBarbatanaChange}
@@ -1086,17 +1034,16 @@ function Measure() {
               </section>
             </section>
           </section>
-
           <div className="_wrapper-div">
             <section className="_wrapper-divModel">
               <section className="typeTextModel">
                 <p className="for-text">MODELO DA CAMISA</p>
               </section>
-
               <section className="boxTypePersinalized">
                 <section className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="slin" className="for-text">
                     <input
+                      id="slin"
                       className="_secImput-radio"
                       type="radio"
                       value="Slin"
@@ -1106,10 +1053,10 @@ function Measure() {
                     SLIN
                   </label>
                 </section>
-
                 <section className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="confort" className="for-text">
                     <input
+                      id="confort"
                       className="_secImput-radio"
                       type="radio"
                       value="Confort"
@@ -1120,15 +1067,14 @@ function Measure() {
                   </label>
                 </section>
               </section>
-
               <section className="typeTextEntraceCosta">
                 <p className="for-text">PENSE</p>
               </section>
-
               <section className="boxTypeEntraceCoast">
                 <section className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="penseSim" className="for-text">
                     <input
+                      id="penseSim"
                       className="_secImput-radio"
                       type="radio"
                       value="Sim"
@@ -1138,10 +1084,10 @@ function Measure() {
                     SIM
                   </label>
                 </section>
-
                 <section className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="penseNao" className="for-text">
                     <input
+                      id="penseNao"
                       className="_secImput-radio"
                       type="radio"
                       value="Não"
@@ -1152,18 +1098,16 @@ function Measure() {
                   </label>
                 </section>
               </section>
-
               <section className="typeTextRigid">
                 <p className="for-text">EXTRA RIGIDO</p>
               </section>
-
               <section className="boxTypeRigid">
                 <section className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="rigidoSim" className="for-text">
                     <input
                       type="radio"
                       className="_secImput-radio"
-                      id="sim"
+                      id="rigidoSim"
                       value="Sim"
                       checked={extraRigido === "Sim"}
                       onChange={handleExtraRigido}
@@ -1173,11 +1117,11 @@ function Measure() {
                 </section>
 
                 <section className="_secInfoRadio">
-                  <label htmlFor="" className="for-text">
+                  <label htmlFor="rigidoNao" className="for-text">
                     <input
                       type="radio"
                       className="_secImput-radio"
-                      id="nao"
+                      id="rigidoNao"
                       value="Não"
                       checked={extraRigido === "Não"}
                       onChange={handleExtraRigido}
@@ -1272,6 +1216,7 @@ function Measure() {
           setOpenMeasure={setOpenMeasure}
           torax={torax}
           cpf={cpf}
+          client={client}
           colar={colar}
           pala={pala}
           manga={manga}

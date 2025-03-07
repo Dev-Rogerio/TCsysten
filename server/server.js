@@ -48,6 +48,9 @@ const generatePdfWithPuppeteer = async (data) => {
   // Substituir os placeholders com os dados
   const htmlContent = template(data);
 
+  // Verifique o HTML gerado
+  console.log("HTML gerado:", htmlContent);
+
   // Carregar o conteúdo HTML na página
   await page.setContent(htmlContent);
   await page.setContent(htmlContent, { waitUntil: "domcontentloaded" });
@@ -65,6 +68,8 @@ const generatePdfWithPuppeteer = async (data) => {
 app.post("/send-email", upload.none(), async (req, res) => {
   try {
     const emailData = req.body;
+
+    console.log(emailData.rows);
 
     // Validação dos dados de entrada
     if (!emailData || !emailData.cpf || !emailData.description) {
