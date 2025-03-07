@@ -25,7 +25,11 @@ if (!fs.existsSync(uploadPath)) {
 
 // Função para gerar PDF a partir de dados e template HTML usando Puppeteer
 const generatePdfWithPuppeteer = async (data) => {
-  const browser = await puppeteer.launch({ headless: true, timeout: 60000 }); // Lançar o Puppeteer em modo headless com timeout aumentado
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    timeout: 60000,
+  }); // Lançar o Puppeteer em modo headless com timeout aumentado
   const page = await browser.newPage();
 
   // Verificar o caminho do template HTML
@@ -66,6 +70,7 @@ const generatePdfWithPuppeteer = async (data) => {
 
 // Rota para gerar e enviar um e-mail com PDF
 app.post("/send-email", upload.none(), async (req, res) => {
+  console.log("Requisição recebida:", req.body); // Verifique se o corpo da requisição está chegando
   try {
     const emailData = req.body;
 
@@ -73,6 +78,7 @@ app.post("/send-email", upload.none(), async (req, res) => {
 
     // Validação dos dados de entrada
     if (!emailData || !emailData.cpf || !emailData.description) {
+      console.log("Dados inválidos recebidos:", emailData); // Verifique os dados recebidos
       return res
         .status(400)
         .json({ success: false, message: "Dados inválidos." });
