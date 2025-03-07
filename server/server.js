@@ -94,8 +94,8 @@ app.post("/send-email", upload.none(), async (req, res) => {
     // Definição das opções do e-mail
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: "roger.ngt3494@gmail.com", // ou adicione mais destinatários
-      subject: `Novo Pedido - Cliente ${emailData.cpf}`,
+      to: ["roger.ngt3494@gmail.com", "adriana.kamisaria@gmail.com"],
+      subject: `Novo Pedido - Cliente ${emailData.client}`,
       text: `Pedido do cliente ${emailData.cpf} realizado com sucesso.`,
       attachments: [
         {
