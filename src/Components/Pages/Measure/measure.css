@@ -65,7 +65,23 @@ hr {
   font-size: 0.7em;
   color: #333;
   resize: vertical;
+  cursor: pointer;
 }
+.for-Inputs::placeholder {
+  font-size: 10px;
+  color: #ccc;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.for-text input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  margin: 0; /* Evita margens indesejadas */
+  flex-shrink: 0; /* Impede que o botão diminua de tamanho */
+}
+
 .for-Inputs {
   padding: 6px 10px;
   font-size: 14px;
@@ -276,6 +292,7 @@ hr {
   width: 100%;
   gap: 5px;
 }
+
 ._wrapper-nav {
   display: flex;
   width: 100%;

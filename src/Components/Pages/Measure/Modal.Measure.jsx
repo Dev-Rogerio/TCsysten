@@ -9,6 +9,7 @@ const ModalMeasure = ({
   rows,
   setRows,
   cpf,
+  client,
   colar,
   pala,
   manga,
@@ -49,6 +50,7 @@ const ModalMeasure = ({
   const handleSendEmail = async () => {
     const emailData = {
       cpf,
+      client,
       colar,
       pala,
       manga,
@@ -147,7 +149,7 @@ const ModalMeasure = ({
               CPF: <strong>{cpf}</strong>
             </p>
             <p>
-              Cliente: <strong>{""}</strong>
+              Cliente: <strong>{client}</strong>
             </p>
             <p>
               Contato: <strong>{""}</strong>
@@ -176,10 +178,13 @@ const ModalMeasure = ({
               Colar: <strong>{colar}</strong>
             </p>
             <p>
-              Tórax: <strong>{torax}</strong>
+              Pala: <strong>{pala}</strong>
             </p>
             <p>
-              Pala: <strong>{pala}</strong>
+              Manga: <strong>{manga}</strong>
+            </p>
+            <p>
+              Tórax: <strong>{torax}</strong>
             </p>
             <p>
               Cintura: <strong>{cintura}</strong>
@@ -188,7 +193,7 @@ const ModalMeasure = ({
               Quadril: <strong>{quadril}</strong>
             </p>
             <p>
-              Manga: <strong>{manga}</strong>
+              Cumprimento: <strong>{cumprimento}</strong>
             </p>
             <p>
               Biceps: <strong>{biceps}</strong>
@@ -250,10 +255,31 @@ const ModalMeasure = ({
             <div className="areaButton">
               <button onClick={handleSendEmail}>Enviar E-mail</button>
               <button onClick={handlePrint}>Imprimir</button>
-              <button onClick={handleCloseModal}>Voltar</button>
+              <button onClick={handleCloseModal}>Corrigir</button>
             </div>
           </section>
         </div>
+
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Cód. Produto</th>
+              <th>Cód. Tecido</th>
+              <th>Textura</th>
+              <th>Fornecedor</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, index) => (
+              <tr key={index}>
+                <td>{row.codTextil}</td>
+                <td>{row.codProduct}</td>
+                <td>{row.texture}</td>
+                <td>{row.fornecedor}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
