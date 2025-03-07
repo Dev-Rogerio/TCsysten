@@ -273,9 +273,14 @@ function Measure() {
       typePense,
     };
 
+    const API_URL =
+      process.env.NODE_ENV === "production"
+        ? "https://tales-cotovia.onrender.com/send-email"
+        : "http://localhost:5000/send-email";
+
     // Enviar os dados para o servidor
     try {
-      const response = await fetch("http://localhost:5000/send-email", {
+      const response = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
