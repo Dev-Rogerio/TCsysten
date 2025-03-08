@@ -13,7 +13,10 @@ const cors = require("cors");
 //   origin: "*", // Permite requisições de qualquer origem
 //   methods: ["GET", "POST", "PUT", "DELETE"], // Permite os métodos necessários
 // };
+const app = express();
+const port = process.env.PORT || 5000;
 
+// Configuração do CORS para permitir requisições de origens específicas
 const corsOptions = {
   origin: ["https://tcsysten.netlify.app", "http://localhost:3000"],
   methods: ["GET", "POST"],
@@ -21,10 +24,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
-const app = express();
-const port = process.env.PORT || 5000;
-
 app.use(express.json());
 
 // Configuração do Multer para upload de arquivos
@@ -69,7 +68,6 @@ const generatePdfWithPuppeteer = async (data) => {
   console.log("HTML gerado:", htmlContent);
 
   // Carregar o conteúdo HTML na página
-  await page.setContent(htmlContent);
   await page.setContent(htmlContent, { waitUntil: "domcontentloaded" });
 
   // Gerar o PDF com as configurações necessárias
@@ -112,7 +110,9 @@ app.post("/send-email", upload.none(), async (req, res) => {
 
     // Configuração do transporter para envio de e-mail
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -120,6 +120,10 @@ app.post("/send-email", upload.none(), async (req, res) => {
     });
 
     // Definição das opções do e-mail
+
+    const timestamp = Date.now();
+    const pdfFilename = `pedido-${timestamp}.pdf`;
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: ["roger.ngt3494@gmail.com", "adriana.kamisaria@gmail.com"],
@@ -127,7 +131,7 @@ app.post("/send-email", upload.none(), async (req, res) => {
       text: `Pedido do cliente ${emailData.cpf} realizado com sucesso.`,
       attachments: [
         {
-          filename: `pedido-${Date.now()}.pdf`, // Nome único para o PDF
+          filename: pdfFilename, // Nome único para o PDF
           path: pdfPath, // Caminho correto do PDF gerado
         },
       ],
