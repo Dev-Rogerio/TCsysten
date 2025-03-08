@@ -79,6 +79,11 @@ const generatePdfWithPuppeteer = async (data) => {
   return pdfPath;
 };
 
+// Adicionar uma rota GET na raiz do servidor
+app.get("/", (req, res) => {
+  res.send("Servidor funcionando corretamente!");
+});
+
 // Rota para gerar e enviar um e-mail com PDF
 app.post("/send-email", upload.none(), async (req, res) => {
   console.log("Requisição recebida:", req.body); // Verifique se o corpo da requisição está chegando
