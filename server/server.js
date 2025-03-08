@@ -89,6 +89,15 @@ app.post("/send-email", upload.none(), async (req, res) => {
         .status(400)
         .json({ success: false, message: "Dados inválidos." });
     }
+    // Adicionando validação para o campo 'rows'
+    if (!emailData.rows || emailData.rows.length === 0) {
+      console.log("O campo 'rows' está vazio ou não foi preenchido.");
+      return res
+        .status(400)
+        .json({ success: false, message: "O campo 'rows' é obrigatório." });
+    }
+
+    console.log("Dados recebidos: ", emailData.rows);
 
     // Gerar o PDF com Puppeteer
     const pdfPath = await generatePdfWithPuppeteer(emailData); // Gera o PDF com Puppeteer
