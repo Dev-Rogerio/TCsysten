@@ -9,16 +9,23 @@ const puppeteer = require("puppeteer"); // Adiciona puppeteer
 const cors = require("cors");
 
 // Configuração do CORS para permitir requisições de qualquer origem
+// const corsOptions = {
+//   origin: "*", // Permite requisições de qualquer origem
+//   methods: ["GET", "POST", "PUT", "DELETE"], // Permite os métodos necessários
+// };
+
 const corsOptions = {
-  origin: "*", // Permite requisições de qualquer origem
-  methods: ["GET", "POST", "PUT", "DELETE"], // Permite os métodos necessários
+  origin: ["https://tcsysten.netlify.app", "http://localhost:3000"],
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type"],
 };
+
+app.use(cors(corsOptions));
 
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use(cors());
 
 // Configuração do Multer para upload de arquivos
 const upload = multer({ dest: "uploads/" });
