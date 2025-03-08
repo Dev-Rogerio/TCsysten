@@ -18,8 +18,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
-// app.use(cors(corsOptions));
-app.use(cors({ origin: "*" }));
+app.use(cors());
 
 // Configuração do Multer para upload de arquivos
 const upload = multer({ dest: "uploads/" });
