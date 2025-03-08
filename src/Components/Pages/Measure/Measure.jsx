@@ -148,28 +148,6 @@ function Measure() {
     console.log("openMeasure mudou:", openMeasure);
   }, [openMeasure]);
 
-  const fetchClientData = async (cpf) => {
-    try {
-      // const response = await axios.get(`http://localhost:3000/clienttable?cpf=${cpf}`);
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/clienttable?cpf=${cpf}`
-      );
-
-      if (response.data && response.data.length > 0) {
-        const clientData = response.data[0];
-        setCliente(clientData);
-        setContato(clientData.telefone || "");
-      } else {
-        setCliente({});
-        setContato("");
-      }
-    } catch (error) {
-      console.error("Erro ao buscar dados do cliente:", error);
-      setError("Erro ao buscar dados do cliente");
-      setCliente({});
-      setContato("");
-    }
-  };
   const handleCpfMaskedChange = (e) => {
     const rawValue = e.target.value.replace(/\D/g, ""); // Remove tudo que não for número
     const maskedValue = VMasker.toPattern(rawValue, "999.999.999-99");
@@ -217,6 +195,31 @@ function Measure() {
     return true;
   };
 
+  // ____________________________________________________________________________________________________________
+
+  const fetchClientData = async (cpf) => {
+    try {
+      // const response = await axios.get(`http://localhost:3000/clienttable?cpf=${cpf}`);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/clienttable?cpf=${cpf}`
+      );
+
+      if (response.data && response.data.length > 0) {
+        const clientData = response.data[0];
+        setCliente(clientData);
+        setContato(clientData.telefone || "");
+      } else {
+        setCliente({});
+        setContato("");
+      }
+    } catch (error) {
+      console.error("Erro ao buscar dados do cliente:", error);
+      setError("Erro ao buscar dados do cliente");
+      setCliente({});
+      setContato("");
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -249,6 +252,7 @@ function Measure() {
     const data = {
       cpf,
       description, // Suponho que você tenha uma variável 'description' no seu formulário
+      rows: [],
       measurements: {
         colar,
         pala,
