@@ -8,22 +8,6 @@ const handlebars = require("handlebars");
 const puppeteer = require("puppeteer"); // Adiciona puppeteer
 const cors = require("cors");
 
-// Adicione isso no início do arquivo server.js
-const { execSync } = require("child_process");
-
-// Tente instalar o puppeteer antes de iniciar o servidor
-try {
-  execSync("npm install puppeteer --production", { stdio: "inherit" });
-  console.log("Puppeteer instalado com sucesso.");
-} catch (error) {
-  console.error("Erro ao instalar o Puppeteer:", error);
-}
-
-// Configuração do CORS para permitir requisições de qualquer origem
-// const corsOptions = {
-//   origin: "*", // Permite requisições de qualquer origem
-//   methods: ["GET", "POST", "PUT", "DELETE"], // Permite os métodos necessários
-// };
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -37,7 +21,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Configuração do Multer para upload de arquivos
+// Configuração do Multer para upload de arquivos (caso precise)
 const upload = multer({ dest: "uploads/" });
 
 // Criar diretório uploads se não existir
@@ -52,10 +36,10 @@ const generatePdfWithPuppeteer = async (data) => {
     headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
     timeout: 60000,
-  }); // Lançar o Puppeteer em modo headless com timeout aumentado
+  });
   const page = await browser.newPage();
 
-  // Verificar o caminho do template HTML
+  // Caminho do template HTML
   const htmlTemplatePath = path.join(
     __dirname,
     "..",
@@ -72,10 +56,10 @@ const generatePdfWithPuppeteer = async (data) => {
   const htmlTemplate = fs.readFileSync(htmlTemplatePath, "utf-8");
   const template = handlebars.compile(htmlTemplate);
 
-  // Substituir os placeholders com os dados
+  // Substituir placeholders com os dados
   const htmlContent = template(data);
 
-  // Verifique o HTML gerado
+  // Verifique o HTML gerado (para depuração)
   console.log("HTML gerado:", htmlContent);
 
   // Carregar o conteúdo HTML na página
@@ -90,27 +74,26 @@ const generatePdfWithPuppeteer = async (data) => {
   return pdfPath;
 };
 
-// Adicionar uma rota GET na raiz do servidor
+// Rota inicial para verificar se o servidor está funcionando
 app.get("/", (req, res) => {
   res.send("Servidor funcionando corretamente!");
 });
 
-// Rota para gerar e enviar um e-mail com PDF
+// Rota para gerar e enviar e-mail com PDF
 app.post("/send-email", upload.none(), async (req, res) => {
-  console.log("Requisição recebida:", req.body); // Verifique se o corpo da requisição está chegando
+  console.log("Requisição recebida:", req.body);
+
   try {
     const emailData = req.body;
 
-    console.log(emailData.rows);
-
     // Validação dos dados de entrada
     if (!emailData || !emailData.cpf || !emailData.description) {
-      console.log("Dados inválidos recebidos:", emailData); // Verifique os dados recebidos
+      console.log("Dados inválidos recebidos:", emailData);
       return res
         .status(400)
         .json({ success: false, message: "Dados inválidos." });
     }
-    // Adicionando validação para o campo 'rows'
+
     if (!emailData.rows || emailData.rows.length === 0) {
       console.log("O campo 'rows' está vazio ou não foi preenchido.");
       return res
@@ -118,23 +101,20 @@ app.post("/send-email", upload.none(), async (req, res) => {
         .json({ success: false, message: "O campo 'rows' é obrigatório." });
     }
 
-    console.log("Dados recebidos: ", emailData.rows);
-
-    // Gerar o PDF com Puppeteer
+    // Gerar PDF com Puppeteer
     const pdfPath = await generatePdfWithPuppeteer(emailData); // Gera o PDF com Puppeteer
     console.log("PDF Gerado em:", pdfPath);
 
     // Configuração do transporter para envio de e-mail
     const transporter = nodemailer.createTransport({
-      service: process.env.EMAIL_SERVICE, // 'gmail'
+      service: process.env.EMAIL_SERVICE, // 'gmail' ou outro serviço configurado
       auth: {
-        user: process.env.EMAIL_USER, // 'roger.ngt3494@gmail.com'
-        pass: process.env.EMAIL_PASS, // 'sdie utuy vhqc ccdm'
+        user: process.env.EMAIL_USER, // Seu e-mail
+        pass: process.env.EMAIL_PASS, // Sua senha ou token
       },
     });
 
-    // Definição das opções do e-mail
-
+    // Definir as opções do e-mail
     const timestamp = Date.now();
     const pdfFilename = `pedido-${timestamp}.pdf`;
 
@@ -145,7 +125,7 @@ app.post("/send-email", upload.none(), async (req, res) => {
       text: `Pedido do cliente ${emailData.cpf} realizado com sucesso.`,
       attachments: [
         {
-          filename: `pedido-${Date.now()}.pdf`, // Nome do PDF
+          filename: pdfFilename, // Nome do PDF
           path: pdfPath, // Caminho do PDF gerado
         },
       ],
@@ -165,7 +145,7 @@ app.post("/send-email", upload.none(), async (req, res) => {
   }
 });
 
-// Iniciar servidor
+// Iniciar o servidor
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });

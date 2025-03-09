@@ -17,6 +17,7 @@ import ModalSelect from "./modal.Select";
 import { jsPDF } from "jspdf";
 import { Button } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ConstructionOutlined from "@mui/icons-material/ConstructionOutlined";
 
 import "../Measure/measure.css";
 import "../Measure/modalError.css";
@@ -307,35 +308,80 @@ function Measure() {
         : "http://localhost:5000/send-email";
 
     // Enviar os dados para o servidor
+    // try {
+    //   const response = await fetch(`${API_URL}/send-email`, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(data),
+    //   });
+
+    //   const result = await response.json();
+    //   if (!response.ok) {
+    //     ConstructionOutlined.error("Erro ao enviar o email:", result);
+    //   }
+    //   console.log(result); // Verifique a resposta do servidor no console
+
+    //   if (result.success) {
+    //     alert("E-mail enviado com sucesso!");
+    //   } else {
+    //     alert(`Erro: ${result.message}`);
+    //   }
+    // } catch (error) {
+    //   console.error("Erro ao enviar dados para o servidor:", error);
+    //   alert("Ocorreu um erro ao enviar os dados. Tente novamente.");
+    // }
+
+
     try {
-      const response = await fetch(`${API_URL}/send-email`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        process.env.NODE_ENV === 'production'
+          ? 'https://tales-cotovia.onrender.com/send-email'
+          : 'http://localhost:5000/send-email', // Usar a URL de desenvolvimento para testes locais
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(emailData),
+        }
+      );
 
-      const result = await response.json();
-      if (!response.ok) {
-        ConstructionOutlined.error("Erro ao enviar o email:", result);
-      }
-      console.log(result); // Verifique a resposta do servidor no console
-
-      if (result.success) {
-        alert("E-mail enviado com sucesso!");
+      if (response.ok) {
+        setStatus('Email enviado com sucesso!');
       } else {
-        alert(`Erro: ${result.message}`);
+        setStatus('Falha ao enviar email.');
       }
     } catch (error) {
-      console.error("Erro ao enviar dados para o servidor:", error);
-      alert("Ocorreu um erro ao enviar os dados. Tente novamente.");
+      console.error('Erro ao enviar email:', error);
+      setStatus('Erro ao enviar email.');
     }
 
     // Ações de fechamento do modal ou outras ações que você tenha
     setOpenMeasure(true);
     fetchClientData(cpf);
     setShowModal(false);
+  };
+
+
+
+  import React, { useState } from 'react';
+
+const EnviarEmail = () => {
+  const [emailData, setEmailData] = useState({
+    to: '',
+    subject: '',
+    body: '',
+  });
+  const [status, setStatus] = useState('');
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEmailData({
+      ...emailData,
+      [name]: value,
+    });
   };
 
   const handleVendedorChange = (e) => {
