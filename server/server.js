@@ -8,6 +8,17 @@ const handlebars = require("handlebars");
 const puppeteer = require("puppeteer"); // Adiciona puppeteer
 const cors = require("cors");
 
+// Adicione isso no início do arquivo server.js
+const { execSync } = require("child_process");
+
+// Tente instalar o puppeteer antes de iniciar o servidor
+try {
+  execSync("npm install puppeteer --production", { stdio: "inherit" });
+  console.log("Puppeteer instalado com sucesso.");
+} catch (error) {
+  console.error("Erro ao instalar o Puppeteer:", error);
+}
+
 // Configuração do CORS para permitir requisições de qualquer origem
 // const corsOptions = {
 //   origin: "*", // Permite requisições de qualquer origem
