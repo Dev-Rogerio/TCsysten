@@ -303,8 +303,8 @@ function Measure() {
 
     const API_URL =
       process.env.NODE_ENV === "production"
-        ? "https://tales-cotovia.onrender.com"
-        : "http://localhost:5000";
+        ? "https://tales-cotovia.onrender.com/send-email"
+        : "http://localhost:5000/send-email";
 
     // Enviar os dados para o servidor
     try {
