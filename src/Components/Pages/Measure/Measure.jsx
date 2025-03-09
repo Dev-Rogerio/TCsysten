@@ -216,7 +216,7 @@ function Measure() {
 
   const fetchClientData = async (cpf) => {
     try {
-      const apiUrl = process.env.REACT_APP_API_URL;
+      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
       // Verifica se a URL da API foi corretamente configurada
       if (!apiUrl) {
@@ -317,6 +317,9 @@ function Measure() {
       });
 
       const result = await response.json();
+      if (!response.ok) {
+        ConstructionOutlined.error("Erro ao enviar o email:", result);
+      }
       console.log(result); // Verifique a resposta do servidor no console
 
       if (result.success) {
