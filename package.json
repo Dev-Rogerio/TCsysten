@@ -26,6 +26,7 @@
     "nodemailer": "^6.10.0",
     "pdfkit": "^0.16.0",
     "puppeteer": "^24.4.0",
+    "nodemon": "^3.1.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-input-mask-next": "^3.0.0-alpha.12",
@@ -69,7 +70,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^3.1.9",
     "source-map-loader": "^5.0.0"
   }
 }
