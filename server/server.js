@@ -115,12 +115,10 @@ app.post("/send-email", upload.none(), async (req, res) => {
 
     // Configuração do transporter para envio de e-mail
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
+      service: process.env.EMAIL_SERVICE, // 'gmail'
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.EMAIL_USER, // 'roger.ngt3494@gmail.com'
+        pass: process.env.EMAIL_PASS, // 'sdie utuy vhqc ccdm'
       },
     });
 
@@ -130,14 +128,14 @@ app.post("/send-email", upload.none(), async (req, res) => {
     const pdfFilename = `pedido-${timestamp}.pdf`;
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: ["roger.ngt3494@gmail.com", "adriana.kamisaria@gmail.com"],
+      from: process.env.EMAIL_FROM, // Remetente
+      to: process.env.EMAIL_TO, // Destinatário
       subject: `Novo Pedido - Cliente ${emailData.client}`,
       text: `Pedido do cliente ${emailData.cpf} realizado com sucesso.`,
       attachments: [
         {
-          filename: pdfFilename, // Nome único para o PDF
-          path: pdfPath, // Caminho correto do PDF gerado
+          filename: `pedido-${Date.now()}.pdf`, // Nome do PDF
+          path: pdfPath, // Caminho do PDF gerado
         },
       ],
     };
