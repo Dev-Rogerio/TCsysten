@@ -80,68 +80,110 @@ app.get("/", (req, res) => {
 });
 
 // Rota para gerar e enviar e-mail com PDF
-app.post("/send-email", upload.none(), async (req, res) => {
-  console.log("Requisição recebida:", req.body);
+// app.post("/send-email", upload.none(), async (req, res) => {
+//   console.log("Requisição recebida:", req.body);
 
+//   try {
+//     const emailData = req.body;
+
+//     // Validação dos dados de entrada
+//     if (!emailData || !emailData.cpf || !emailData.description) {
+//       console.log("Dados inválidos recebidos:", emailData);
+//       return res
+//         .status(400)
+//         .json({ success: false, message: "Dados inválidos." });
+//     }
+
+//     if (!emailData.rows || emailData.rows.length === 0) {
+//       console.log("O campo 'rows' está vazio ou não foi preenchido.");
+//       return res
+//         .status(400)
+//         .json({ success: false, message: "O campo 'rows' é obrigatório." });
+//     }
+
+//     // Gerar PDF com Puppeteer
+//     const pdfPath = await generatePdfWithPuppeteer(emailData); // Gera o PDF com Puppeteer
+//     console.log("PDF Gerado em:", pdfPath);
+
+//     // Configuração do transporter para envio de e-mail
+//     // const transporter = nodemailer.createTransport({
+//     //   service: process.env.EMAIL_SERVICE, // 'gmail' ou outro serviço configurado
+//     //   auth: {
+//     //     user: process.env.EMAIL_USER, // Seu e-mail
+//     //     pass: process.env.EMAIL_PASS, // Sua senha ou token
+//     //   },
+//     // });
+
+//     const transporter = nodemailer.createTransport({
+//       host: "smtp.gmail.com",
+//       port: 587,
+//       secure: false, // use TLS
+//       auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_PASS,
+//       },
+//     });
+
+//     // Definir as opções do e-mail
+//     const timestamp = Date.now();
+//     const pdfFilename = `pedido-${timestamp}.pdf`;
+
+//     const mailOptions = {
+//       from: process.env.EMAIL_FROM, // Remetente
+//       to: process.env.EMAIL_TO, // Destinatário
+//       subject: `Novo Pedido - Cliente ${emailData.client}`,
+//       text: `Pedido do cliente ${emailData.cpf} realizado com sucesso.`,
+//       attachments: [
+//         {
+//           filename: pdfFilename, // Nome do PDF
+//           path: pdfPath, // Caminho do PDF gerado
+//         },
+//       ],
+//     };
+
+//     // Enviar o e-mail com o PDF anexado
+//     await transporter.sendMail(mailOptions);
+//     console.log("E-mail enviado com sucesso para:", mailOptions.to);
+
+//     // Deletar o PDF após o envio
+//     fs.unlinkSync(pdfPath);
+
+//     res.json({ success: true, message: "E-mail enviado com sucesso!" });
+//   } catch (error) {
+//     console.error("Erro ao enviar e-mail:", error);
+//     res.status(500).json({ success: false, message: "Erro ao enviar e-mail." });
+//   }
+// });
+
+app.post("/test-email", async (req, res) => {
   try {
-    const emailData = req.body;
-
-    // Validação dos dados de entrada
-    if (!emailData || !emailData.cpf || !emailData.description) {
-      console.log("Dados inválidos recebidos:", emailData);
-      return res
-        .status(400)
-        .json({ success: false, message: "Dados inválidos." });
-    }
-
-    if (!emailData.rows || emailData.rows.length === 0) {
-      console.log("O campo 'rows' está vazio ou não foi preenchido.");
-      return res
-        .status(400)
-        .json({ success: false, message: "O campo 'rows' é obrigatório." });
-    }
-
-    // Gerar PDF com Puppeteer
-    const pdfPath = await generatePdfWithPuppeteer(emailData); // Gera o PDF com Puppeteer
-    console.log("PDF Gerado em:", pdfPath);
-
-    // Configuração do transporter para envio de e-mail
     const transporter = nodemailer.createTransport({
-      service: process.env.EMAIL_SERVICE, // 'gmail' ou outro serviço configurado
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // use TLS
       auth: {
-        user: process.env.EMAIL_USER, // Seu e-mail
-        pass: process.env.EMAIL_PASS, // Sua senha ou token
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
-    // Definir as opções do e-mail
-    const timestamp = Date.now();
-    const pdfFilename = `pedido-${timestamp}.pdf`;
-
     const mailOptions = {
-      from: process.env.EMAIL_FROM, // Remetente
-      to: process.env.EMAIL_TO, // Destinatário
-      subject: `Novo Pedido - Cliente ${emailData.client}`,
-      text: `Pedido do cliente ${emailData.cpf} realizado com sucesso.`,
-      attachments: [
-        {
-          filename: pdfFilename, // Nome do PDF
-          path: pdfPath, // Caminho do PDF gerado
-        },
-      ],
+      from: process.env.EMAIL_FROM,
+      to: process.env.EMAIL_TO,
+      subject: "Teste de Envio de E-mail",
+      text: "Este é um e-mail de teste para verificar se o envio está funcionando.",
     };
 
-    // Enviar o e-mail com o PDF anexado
     await transporter.sendMail(mailOptions);
-    console.log("E-mail enviado com sucesso para:", mailOptions.to);
-
-    // Deletar o PDF após o envio
-    fs.unlinkSync(pdfPath);
-
-    res.json({ success: true, message: "E-mail enviado com sucesso!" });
+    res.json({
+      success: true,
+      message: "E-mail de teste enviado com sucesso!",
+    });
   } catch (error) {
-    console.error("Erro ao enviar e-mail:", error);
-    res.status(500).json({ success: false, message: "Erro ao enviar e-mail." });
+    console.error("Erro ao enviar e-mail de teste:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Erro ao enviar e-mail de teste." });
   }
 });
 
