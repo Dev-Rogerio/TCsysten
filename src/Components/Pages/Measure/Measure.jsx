@@ -112,6 +112,22 @@ function Measure() {
     return currentId + 1;
   };
 
+
+  useEffect(() => {
+    console.log("API URL:", process.env.REACT_APP_API_URL); // Testar se a variável está correta
+    const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  
+    axios
+      .get(`${apiUrl}/`)
+      .then((response) => {
+        console.log("Resposta do servidor:", response.data);
+      })
+      .catch((error) => {
+        console.error("Erro ao conectar com o servidor:", error);
+      });
+  }, []);
+  
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const cpf = queryParams.get("cpf");
@@ -302,10 +318,10 @@ function Measure() {
       typePense,
     };
 
-    const API_URL =
-      process.env.NODE_ENV === "production"
-        ? "https://tales-cotovia.onrender.com/send-email"
-        : "http://localhost:5000/send-email";
+    // const API_URL =
+    //   process.env.NODE_ENV === "production"
+    //     ? "https://tales-cotovia.onrender.com/send-email"
+    //     : "http://localhost:5000/send-email";
 
     // Enviar os dados para o servidor
     // try {
@@ -332,6 +348,16 @@ function Measure() {
     //   console.error("Erro ao enviar dados para o servidor:", error);
     //   alert("Ocorreu um erro ao enviar os dados. Tente novamente.");
     // }
+
+    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
+const response = await fetch(`${API_URL}/send-email`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(data),
+});
+
+
 
 
     try {
