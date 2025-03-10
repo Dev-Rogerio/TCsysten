@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import axios from "axios";
 import { redirectDocument, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import ConstructionOutlined from "@mui/icons-material/ConstructionOutlined";
 
 import VMasker from "vanilla-masker";
 
@@ -197,150 +198,9 @@ function Measure() {
 
   // ____________________________________________________________________________________________________________
 
-  // const TestConnection = () => {
-  //   useEffect(() => {
-  //     const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000"; // Usando a variável de ambiente
-
-  //     axios
-  //       .get(`${apiUrl}/`)
-  //       .then((response) => {
-  //         console.log("Resposta do servidor:", response.data);
-  //       })
-  //       .catch((error) => {
-  //         console.error("Erro ao conectar com o servidor:", error);
-  //       });
-  //   }, []);
-
-  //   return <div>Testando conexão com o servidor...</div>;
-  // };
-
-  // const fetchClientData = async (cpf) => {
-  //   try {
-  //     const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
-
-  //     // Verifica se a URL da API foi corretamente configurada
-  //     if (!apiUrl) {
-  //       console.error("API URL não configurada!");
-  //       return;
-  //     }
-
-  //     const response = await axios.get(`${apiUrl}/clienttable?cpf=${cpf}`);
-
-  //     if (response.data && response.data.length > 0) {
-  //       const clientData = response.data[0];
-  //       setCliente(clientData);
-  //       setContato(clientData.telefone || "");
-  //     } else {
-  //       setCliente({});
-  //       setContato("");
-  //     }
-  //   } catch (error) {
-  //     console.error("Erro ao buscar dados do cliente:", error);
-  //     setError("Erro ao buscar dados do cliente");
-  //     setCliente({});
-  //     setContato("");
-  //   }
-  // };
-
-  // const handleSubmit = async (event) => {
-  //   event.preventDefault();
-
-  //   // Validação do vendedor
-  //   if (!vendedor.trim()) {
-  //     setErrorMessage("O campo vendedor está vazio");
-  //     setShowModal(true);
-  //     return;
-  //   }
-
-  //   // Validação do CPF
-  //   if (!isValidCPF(cpf)) {
-  //     console.error("CPF inválido");
-  //     setErrorMessage("O CPF inserido é inválido!");
-  //     setShowModal(true);
-  //     return; // Para a execução caso o CPF seja inválido
-  //   }
-
-  //   if (!client.trim()) {
-  //     setErroMessage("O Campo Cliente esta vazio");
-  //     setShowModal(true);
-  //     return;
-  //   }
-
-  //   // Ações após passar todas as validações
-  //   console.log("Formulário enviado com sucesso!");
-
-  //   console.log("Dados enviados:", data);
-
-  //   const data = {
-  //     cpf,
-  //     description, // Suponho que você tenha uma variável 'description' no seu formulário
-  //     rows: [],
-  //     measurements: {
-  //       colar,
-  //       pala,
-  //       manga,
-  //       torax,
-  //       cintura,
-  //       quadril,
-  //       cumprimento,
-  //       biceps,
-  //       antebraco,
-  //       punhoEsquerdo,
-  //       punhoDireito,
-  //     },
-  //     vendedor,
-  //     deliveryDate,
-  //     metersTissue,
-  //     monograma,
-  //     modelFish,
-  //     typeFront,
-  //     typeModel,
-  //     extraRigido,
-  //     barbatana,
-  //     modelColar,
-  //     typePense,
-  //   };
-
-  //   const API_URL =
-  //     process.env.NODE_ENV === "production"
-  //       ? "https://tales-cotovia.onrender.com"
-  //       : "http://localhost:5000";
-
-  //   // Enviar os dados para o servidor
-  //   try {
-  //     const response = await fetch(`${API_URL}/send-email`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(data),
-  //     });
-
-  //     const result = await response.json();
-  //     if (!response.ok) {
-  //       ConstructionOutlined.error("Erro ao enviar o email:", result);
-  //     }
-  //     console.log(result); // Verifique a resposta do servidor no console
-
-  //     if (result.success) {
-  //       alert("E-mail enviado com sucesso!");
-  //     } else {
-  //       alert(`Erro: ${result.message}`);
-  //     }
-  //   } catch (error) {
-  //     console.error("Erro ao enviar dados para o servidor:", error);
-  //     alert("Ocorreu um erro ao enviar os dados. Tente novamente.");
-  //   }
-
-  //   // Ações de fechamento do modal ou outras ações que você tenha
-  //   setOpenMeasure(true);
-  //   fetchClientData(cpf);
-  //   setShowModal(false);
-  // };
-
   const TestConnection = () => {
     useEffect(() => {
-      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000"; // Usando a variável de ambiente
 
       axios
         .get(`${apiUrl}/`)
@@ -355,16 +215,26 @@ function Measure() {
     return <div>Testando conexão com o servidor...</div>;
   };
 
-  const fetchClientData = async (cpf, setCliente, setContato, setError) => {
+  const fetchClientData = async (cpf) => {
     try {
       const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      if (!apiUrl) throw new Error("API URL não configurada!");
+
+      // Verifica se a URL da API foi corretamente configurada
+      if (!apiUrl) {
+        console.error("API URL não configurada!");
+        return;
+      }
 
       const response = await axios.get(`${apiUrl}/clienttable?cpf=${cpf}`);
-      const clientData = response.data?.[0] || {};
 
-      setCliente(clientData);
-      setContato(clientData.telefone || "");
+      if (response.data && response.data.length > 0) {
+        const clientData = response.data[0];
+        setCliente(clientData);
+        setContato(clientData.telefone || "");
+      } else {
+        setCliente({});
+        setContato("");
+      }
     } catch (error) {
       console.error("Erro ao buscar dados do cliente:", error);
       setError("Erro ao buscar dados do cliente");
@@ -373,59 +243,52 @@ function Measure() {
     }
   };
 
-  const handleSubmit = async (
-    event,
-    formData,
-    setErrorMessage,
-    setShowModal,
-    setOpenMeasure,
-    fetchClientData
-  ) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const {
-      cpf,
-      vendedor,
-      client,
-      description,
-      measurements,
-      deliveryDate,
-      metersTissue,
-      monograma,
-      modelFish,
-      typeFront,
-      typeModel,
-      extraRigido,
-      barbatana,
-      modelColar,
-      typePense,
-      setCliente,
-      setContato,
-    } = formData;
 
-    if (!vendedor.trim())
-      return handleError(
-        "O campo vendedor está vazio",
-        setErrorMessage,
-        setShowModal
-      );
-    if (!isValidCPF(cpf))
-      return handleError(
-        "O CPF inserido é inválido!",
-        setErrorMessage,
-        setShowModal
-      );
-    if (!client.trim())
-      return handleError(
-        "O Campo Cliente está vazio",
-        setErrorMessage,
-        setShowModal
-      );
+    // Validação do vendedor
+    if (!vendedor.trim()) {
+      setErrorMessage("O campo vendedor está vazio");
+      setShowModal(true);
+      return;
+    }
+
+    // Validação do CPF
+    if (!isValidCPF(cpf)) {
+      console.error("CPF inválido");
+      setErrorMessage("O CPF inserido é inválido!");
+      setShowModal(true);
+      return; // Para a execução caso o CPF seja inválido
+    }
+
+    if (!client.trim()) {
+      setErroMessage("O Campo Cliente esta vazio");
+      setShowModal(true);
+      return;
+    }
+
+    // Ações após passar todas as validações
+    console.log("Formulário enviado com sucesso!");
+
+    console.log("Dados enviados:", data);
 
     const data = {
       cpf,
-      description,
+      description, // Suponho que você tenha uma variável 'description' no seu formulário
       rows: [],
-      measurements,
+      measurements: {
+        colar,
+        pala,
+        manga,
+        torax,
+        cintura,
+        quadril,
+        cumprimento,
+        biceps,
+        antebraco,
+        punhoEsquerdo,
+        punhoDireito,
+      },
       vendedor,
       deliveryDate,
       metersTissue,
@@ -438,39 +301,42 @@ function Measure() {
       modelColar,
       typePense,
     };
+
     const API_URL =
       process.env.NODE_ENV === "production"
         ? "https://tales-cotovia.onrender.com"
         : "http://localhost:5000";
 
+    // Enviar os dados para o servidor
     try {
       const response = await fetch(`${API_URL}/send-email`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(data),
       });
 
       const result = await response.json();
-      if (!response.ok)
-        throw new Error(result.message || "Erro ao enviar o e-mail");
-      alert(
-        result.success
-          ? "E-mail enviado com sucesso!"
-          : `Erro: ${result.message}`
-      );
+      if (!response.ok) {
+        ConstructionOutlined.error("Erro ao enviar o email:", result);
+      }
+      console.log(result); // Verifique a resposta do servidor no console
+
+      if (result.success) {
+        alert("E-mail enviado com sucesso!");
+      } else {
+        alert(`Erro: ${result.message}`);
+      }
     } catch (error) {
       console.error("Erro ao enviar dados para o servidor:", error);
       alert("Ocorreu um erro ao enviar os dados. Tente novamente.");
     }
 
+    // Ações de fechamento do modal ou outras ações que você tenha
     setOpenMeasure(true);
-    fetchClientData(cpf, setCliente, setContato);
+    fetchClientData(cpf);
     setShowModal(false);
-  };
-
-  const handleError = (message, setErrorMessage, setShowModal) => {
-    setErrorMessage(message);
-    setShowModal(true);
   };
 
   const handleVendedorChange = (e) => {
