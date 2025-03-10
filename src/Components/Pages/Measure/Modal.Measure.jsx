@@ -80,7 +80,7 @@ const ModalMeasure = ({
     };
 
     try {
-      const response = await fetch("http://localhost:5000/send-email", {
+      const response = await fetch("https://tales-cotovia.onrender.com", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,6 +91,8 @@ const ModalMeasure = ({
       const data = await response.json();
 
       if (response.ok) {
+        const data = await response.json();
+        console.error("Erro ao enviar e-mail:", data);
         alert("E-mail enviado com sucesso!");
         setOpenMeasure(false);
       } else {
