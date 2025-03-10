@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import LogoCotovia from "../../AssetsIcons/cotovia.png";
-import "../Measure/Modal.Measure.css";
-import { useNavigate } from "react-router-dom";
+import Logo from "../../AssetsIcons/logo.png";
+import "./modal.measure.css";
+import { useHref } from "react-router-dom";
 
 const ModalMeasure = ({
   openMeasure,
@@ -9,7 +9,6 @@ const ModalMeasure = ({
   rows,
   setRows,
   cpf,
-  client,
   colar,
   pala,
   manga,
@@ -34,23 +33,43 @@ const ModalMeasure = ({
   typeFront,
   typeModel,
   typePense,
-  description = "", // Valor inicial da descrição
+  description = "", // Valor padrão vazio
+  setDescription,
 }) => {
-  const [localDescription, setLocalDescription] = useState(description); // Inicializa com a descrição passada
-  const navigate = useNavigate();
+  const [localDescription, setLocalDescription] = useState(description);
 
-  // Carregar a descrição apenas da prop 'description' (sem uso do localStorage)
   useEffect(() => {
-    if (!openMeasure) return;
+    console.log("Descrição recebida na modal:", description);
+    // Atualiza o estado sempre que a prop description mudar
+    if (description !== localDescription) {
+      setLocalDescription(description);
+    }
+  }, [description]);
 
-    setLocalDescription(description || ""); // Garantir que, caso não tenha descrição, use uma string vazia
-  }, [openMeasure, description]);
+  const handlePrint = () => {
+    const originalBody = document.body.innerHTML;
+    try {
+      const modalContent = document.querySelector(".modal").innerHTML;
+      document.body.innerHTML = modalContent;
+      window.print();
+    } finally {
+      document.body.innerHTML = originalBody;
+    }
+  };
 
-  // Função para enviar o e-mail com os dados do pedido
   const handleSendEmail = async () => {
+    const requiredFields = { cpf, colar, pala, manga };
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => !value)
+      .map(([key]) => key);
+
+    if (missingFields.length) {
+      alert(`Campos obrigatórios ausentes: ${missingFields.join(", ")}`);
+      return;
+    }
+
     const emailData = {
       cpf,
-      client,
       colar,
       pala,
       manga,
@@ -76,26 +95,30 @@ const ModalMeasure = ({
       typeModel,
       typePense,
       description: localDescription,
-      rows,
     };
 
+    console.log("Dados que estão sendo enviados:", emailData);
+
     try {
-      const response = await fetch("https://tales-cotovia.onrender.com", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(emailData),
-      });
+      const response = await fetch(
+        "https://tales-cotovia.onrender.com/send-email",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(emailData),
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
-        const data = await response.json();
-        console.error("Erro ao enviar e-mail:", data);
+        console.log("E-mail enviado com sucesso:", data);
         alert("E-mail enviado com sucesso!");
         setOpenMeasure(false);
       } else {
+        console.error("Erro do servidor:", data.message);
         alert(`Erro ao enviar e-mail: ${data.message || "Erro desconhecido"}`);
       }
     } catch (error) {
@@ -103,55 +126,39 @@ const ModalMeasure = ({
       alert("Ocorreu um erro ao tentar enviar o e-mail.");
     }
   };
-
-  // Função para imprimir o conteúdo do modal
-  const handlePrint = () => {
-    const originalBody = document.body.innerHTML;
-    try {
-      const modalContent = document.querySelector(".modal").innerHTML;
-      document.body.innerHTML = modalContent;
-      window.print();
-    } finally {
-      document.body.innerHTML = originalBody;
-    }
+  const handleChange = (e) => {
+    setLocalDescription(e.target.value);
+    setDescription(e.target.value); // Certifique-se de que a função 'setDescription' seja chamada para atualizar o estado no componente pai
   };
 
-  // Função para fechar o modal
   const handleCloseModal = () => {
-    setRows(rows);
+    setRows((prev) => ({ ...prev, description: localDescription }));
     setOpenMeasure(false);
-    navigate("/"); // Navega para a página de measure
   };
 
-  // Atualiza o valor de 'localDescription' quando o usuário digita no textarea
-  const handleDescriptionChange = (e) => {
-    const updatedDescription = e.target.value;
-    setLocalDescription(updatedDescription);
-  };
+  console.log("Estado localDescription:", localDescription); // Log para ver o valor do estado localDescription
 
   if (!openMeasure) return null;
 
   return (
     <div className="modal">
       <div>
-        {/* Header */}
         <section className="_navModalMeasure">
-          <img src={LogoCotovia} alt="Logo Cotovia" />
+          <img src={Logo} alt="" />
         </section>
-
-        {/* Título */}
         <section className="text-titlle">
-          <h1>Ficha Técnica do Pedido</h1>
+          <h1>"Ficha Técnica do Pedido"</h1>
+          <p>
+            Id: <strong>{id}</strong>
+          </p>
         </section>
-
-        {/* Informações do Cliente e Pedido */}
         <div className="sectorClientSuplier">
           <section className="_sectionClient">
             <p>
               CPF: <strong>{cpf}</strong>
             </p>
             <p>
-              Cliente: <strong>{client}</strong>
+              Cliente: <strong>{""}</strong>
             </p>
             <p>
               Contato: <strong>{""}</strong>
@@ -172,21 +179,16 @@ const ModalMeasure = ({
             </p>
           </section>
         </div>
-
-        {/* Medidas Personalizadas */}
         <div className="sectorPersonalized">
           <section className="_firstLeft-MeasureDate">
             <p>
               Colar: <strong>{colar}</strong>
             </p>
             <p>
-              Pala: <strong>{pala}</strong>
-            </p>
-            <p>
-              Manga: <strong>{manga}</strong>
-            </p>
-            <p>
               Tórax: <strong>{torax}</strong>
+            </p>
+            <p>
+              Pala: <strong>{pala}</strong>
             </p>
             <p>
               Cintura: <strong>{cintura}</strong>
@@ -195,7 +197,7 @@ const ModalMeasure = ({
               Quadril: <strong>{quadril}</strong>
             </p>
             <p>
-              Cumprimento: <strong>{cumprimento}</strong>
+              Manga: <strong>{manga}</strong>
             </p>
             <p>
               Biceps: <strong>{biceps}</strong>
@@ -224,7 +226,7 @@ const ModalMeasure = ({
               Monograma: <strong>{monograma}</strong>
             </p>
             <p>
-              Rígido: <strong>{extraRigido}</strong>
+              Rigido: <strong>{extraRigido}</strong>
             </p>
             <p>
               Barbatana: <strong>{barbatana}</strong>
@@ -240,48 +242,44 @@ const ModalMeasure = ({
             </p>
           </section>
         </div>
-
-        {/* Área para descrição */}
         <div className="_wrapperModArea">
           <textarea
             name="Importante"
             id="important"
             value={localDescription}
-            onChange={handleDescriptionChange} // Atualiza a descrição com o valor digitado
+            onChange={handleChange}
+            rows="4"
+            cols="50"
+            placeholder="Escreva suas observações aqui..."
           />
         </div>
+        {/* Agora exibindo a descrição digitada */}
 
-        {/* Botões */}
         <div className="sectorBotton">
-          <section className="_wrapper-divFooter">
-            <div className="areaButton">
-              <button onClick={handleSendEmail}>Enviar E-mail</button>
-              <button onClick={handlePrint}>Imprimir</button>
-              <button onClick={handleCloseModal}>Corrigir</button>
-            </div>
-          </section>
+          <button onClick={handleCloseModal}>Confirmar</button>
+          <button onClick={handlePrint}>Imprimir</button>
+          <button onClick={handleSendEmail}>Enviar E-mail</button>
         </div>
-
-        <table border="1">
-          <thead>
-            <tr>
-              <th>Cód. Produto</th>
-              <th>Cód. Tecido</th>
-              <th>Textura</th>
-              <th>Fornecedor</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, index) => (
-              <tr key={index}>
-                <td>{row.codTextil}</td>
-                <td>{row.codProduct}</td>
-                <td>{row.texture}</td>
-                <td>{row.fornecedor}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {rows && rows.length > 0 ? (
+          rows.map((row, index) => (
+            <div key={index} className="_wrapper-InfoDescription">
+              <p>
+                Código do Tecido: <strong>{row.codTextil || "N/A"}</strong>
+              </p>
+              <p>
+                Código do Produto: <strong>{row.codProduct || "N/A"}</strong>
+              </p>
+              <p>
+                Tipo de Textura: <strong>{row.texture || "N/A"}</strong>
+              </p>
+              <p>
+                Fornecedor: <strong>{row.fornecedor || "N/A"}</strong>
+              </p>
+            </div>
+          ))
+        ) : (
+          <p>Nenhum dado disponível</p>
+        )}
       </div>
     </div>
   );
