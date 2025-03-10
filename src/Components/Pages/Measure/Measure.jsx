@@ -1,19 +1,26 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import axios from "axios";
 import { redirectDocument, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import InputMask from "react-input-mask";
+import ConstructionOutlined from "@mui/icons-material/ConstructionOutlined";
+
+import VMasker from "vanilla-masker";
+
 import Colarinho from "../../AssetsIcons/typeColarinho.png";
 import Duplo from "../../AssetsIcons/duplo.png";
 import Redondo from "../../AssetsIcons/redondo.png";
 import Chanfrado from "../../AssetsIcons/chanfrado.png";
-import Logo from "../../AssetsIcons/logo.png";
-import ModalMeasure from "./modal.measure.jsx";
-import Modal from "./modalError.jsx";
-import "./measure.css";
-import "./modalError.css";
-import ModalSelect from "./modal.Select.jsx";
+import Site from "../../AssetsIcons/logocotovia.jpeg";
+import ModalMeasure from "./Modal.Measure";
+import Modal from "./modalError";
+import ModalSelect from "./modal.Select";
 import { jsPDF } from "jspdf";
+import { Button } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+import "../Measure/measure.css";
+import "../Measure/modalError.css";
 
 function calculateDeliveryDate(date) {
   if (!date) return "";
@@ -24,7 +31,7 @@ function calculateDeliveryDate(date) {
 function Measure() {
   const [dadosCliente, setDadosCliente] = useState(null);
   const [cpf, setCpf] = useState("");
-  const [cliente, setCliente] = useState(null);
+  const [cliente, setCliente] = useState("");
   const location = useLocation();
   const [contato, setContato] = useState("");
   const [error, setError] = useState("");
@@ -40,7 +47,7 @@ function Measure() {
   const [clearCumprimento, setClearCumprimento] = useState("");
   const [clearPunho, setClearPunho] = useState("");
   const [clearMetro, setClearMetro] = useState("");
-  const [orderId, setOrderId] = useState(1);
+
   const [clearParis, setClearParis] = useState("");
   const [clearWindsor, setClearWindsor] = useState("");
   const [clearItaly, setClearItaly] = useState("");
@@ -71,7 +78,7 @@ function Measure() {
   const [barbatana, setBarbatana] = useState("");
   const [modelColar, setModelColar] = useState("");
   const [vendedor, setVendedor] = useState("");
-  const [id, setId] = useState(0);
+  const [id, setId] = useState(1);
   const [deliveryDate, setDeliveryDate] = useState("");
   const [metersTissue, setMetersTissue] = useState("");
   const [monograma, setMonograma] = useState("");
@@ -79,6 +86,7 @@ function Measure() {
   const [typeFront, setTypeFront] = useState("");
   const [typePense, setTypePense] = useState("");
   const [typeModel, setTypeModel] = useState("");
+  const [description, setDescription] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [erroMessage, setErroMessage] = useState("");
   const [select, setSelect] = useState("");
@@ -87,14 +95,22 @@ function Measure() {
   const [codTextil, setCodTextil] = useState("");
   const [texture, setTexture] = useState("");
   const [fornecedor, setFornecedor] = useState("");
-  const [rows, setRows] = useState([]);
-  const [localDescription, setLocalDescription] = useState("");
+  const [rows, setRows] = useState([
+    {
+      codTextil: "",
+      codProduct: "",
+      texture: "",
+      fornecedor: "",
+    },
+  ]);
   const [clearMonograma, setClearMonograma] = useState(false);
-  const [description, setDescription] = useState("");
+  const [localDescription, setLocalDescription] = useState("");
+  const [clientCpf, setClientCpf] = useState("");
+  const [clientDescription, setClientDescription] = useState("");
 
-  useEffect(() => {
-    setLocalDescription(description || "");
-  }, [description]);
+  const generateId = (currentId) => {
+    return currentId + 1;
+  };
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -133,37 +149,17 @@ function Measure() {
     console.log("openMeasure mudou:", openMeasure);
   }, [openMeasure]);
 
-  const nanigate = useNavigate();
-  const handleExite = () => {
-    navigate("/menu");
+  const handleCpfMaskedChange = (e) => {
+    const rawValue = e.target.value.replace(/\D/g, ""); // Remove tudo que não for número
+    const maskedValue = VMasker.toPattern(rawValue, "999.999.999-99");
+    setCpf(maskedValue);
   };
 
-  const fetchClientData = async (cpf) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:3000/clienttable?cpf=${cpf}`
-      );
-      if (response.data && response.data.length > 0) {
-        const clientData = response.data[0];
-        setCliente(clientData);
-        setContato(clientData.telefone || "");
-      } else {
-        setCliente({});
-        setContato("");
-      }
-    } catch (error) {
-      console.error("Erro ao buscar dados do cliente:", error);
-      setError("Erro ao buscar dados do cliente");
-      setCliente({});
-      setContato("");
-    }
+  const handleBlurCpf = () => {
+    // Quando o campo perder o foco, aplica a máscara
+    setCpf(VMasker.toPattern(cpf, "999.999.999-99"));
   };
-  const handleCpfChange = (event) => {
-    setCpf(event.target.value);
-  };
-  // const handlePrint = () => {
-  //   window.print();
-  // };
+
   const handleLimparFormulario = () => {
     setCpf("");
     setCliente({});
@@ -179,7 +175,7 @@ function Measure() {
     setClearQuadril("");
     setClearCumprimento("");
     setBiceps("");
-    antebraco("");
+    setAntebraco("");
     setClearPunho("");
     setClearMetro("");
     setClearMonograma("");
@@ -200,53 +196,52 @@ function Measure() {
     return true;
   };
 
-  //
-  // Função para gerar o PDF
-  const generatePDF = () => {
-    const doc = new jsPDF();
+  // ____________________________________________________________________________________________________________
 
-    doc.text("Informações do Pedido", 20, 20);
-    doc.text(`Modelo de Peixe: ${formData.modelFish}`, 20, 30);
-    doc.text(`Tipo de Frente: ${formData.typeFront}`, 20, 40);
-    doc.text(`Barbatana: ${formData.barbatana}`, 20, 50);
-    doc.text(`Modelo: ${formData.typeModel}`, 20, 60);
-    doc.text(`Pense: ${formData.typePense}`, 20, 70);
-    doc.text(`Extra Rígido: ${formData.extraRigido}`, 20, 80);
-    doc.text(`MTRS/TEC.: ${formData.metersTissue}`, 20, 90);
-    doc.text(`Monograma: ${formData.monograma}`, 20, 100);
-    doc.text(`Observações: ${formData.description}`, 20, 110);
+  const TestConnection = () => {
+    useEffect(() => {
+      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000"; // Usando a variável de ambiente
 
-    // Gera o PDF em memória
-    const pdfBlob = doc.output("blob");
+      axios
+        .get(`${apiUrl}/`)
+        .then((response) => {
+          console.log("Resposta do servidor:", response.data);
+        })
+        .catch((error) => {
+          console.error("Erro ao conectar com o servidor:", error);
+        });
+    }, []);
 
-    // Cria um arquivo real antes de anexar ao FormData
-    const pdfFile = new File([pdfBlob], "pedido.pdf", {
-      type: "application/pdf",
-    });
-
-    // Aqui você pode enviar o PDF por e-mail
-    sendEmailWithPDF(pdfBlob);
+    return <div>Testando conexão com o servidor...</div>;
   };
 
-  // Função para enviar o e-mail com o PDF
-  const sendEmailWithPDF = (pdfBlob) => {
-    const formData = new FormData();
-    const pdfFile = new File([pdfBlob], "pedido.pdf", {
-      type: "application/pdf",
-    });
+  const fetchClientData = async (cpf) => {
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-    formData.append("pdf", pdfFile);
+      // Verifica se a URL da API foi corretamente configurada
+      if (!apiUrl) {
+        console.error("API URL não configurada!");
+        return;
+      }
 
-    // Supondo que você tenha uma rota no backend que lida com o envio de e-mails
-    fetch("https://tales-cotovia.onrender.com/send-email", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => console.log("Email enviado com sucesso", data))
-      .catch((error) => console.error("Erro ao enviar e-mail:", error));
+      const response = await axios.get(`${apiUrl}/clienttable?cpf=${cpf}`);
+
+      if (response.data && response.data.length > 0) {
+        const clientData = response.data[0];
+        setCliente(clientData);
+        setContato(clientData.telefone || "");
+      } else {
+        setCliente({});
+        setContato("");
+      }
+    } catch (error) {
+      console.error("Erro ao buscar dados do cliente:", error);
+      setError("Erro ao buscar dados do cliente");
+      setCliente({});
+      setContato("");
+    }
   };
-  //
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -266,23 +261,21 @@ function Measure() {
       return; // Para a execução caso o CPF seja inválido
     }
 
-    // Validação de outras partes do formulário, caso necessário
+    if (!client.trim()) {
+      setErroMessage("O Campo Cliente esta vazio");
+      setShowModal(true);
+      return;
+    }
 
     // Ações após passar todas as validações
     console.log("Formulário enviado com sucesso!");
 
-    // Preparar os dados para enviar ao servidor
-    // const data = {
-    //   cpf,
-    //   description, // Suponho que você tenha uma variável 'description' no seu formulário
-    //   measurements, // Suponho que você tenha uma variável 'measurements' com as medidas
-    //   rows, // As linhas de itens adicionais
-    // };
     console.log("Dados enviados:", data);
 
     const data = {
       cpf,
       description, // Suponho que você tenha uma variável 'description' no seu formulário
+      rows: [],
       measurements: {
         colar,
         pala,
@@ -296,33 +289,38 @@ function Measure() {
         punhoEsquerdo,
         punhoDireito,
       },
-      vendedor, // Dados do vendedor
-      deliveryDate, // Data de entrega
-      metersTissue, // Medida de tecido
-      monograma, // Monograma
-      modelFish, // Modelo de peixe
-      typeFront, // Tipo de frente
-      typeModel, // Tipo de modelo
-      extraRigido, // Extra rígido
-      barbatana, // Barbatana
-      modelColar, // Modelo de colar
-      typePense, // Tipo de pense
+      vendedor,
+      deliveryDate,
+      metersTissue,
+      monograma,
+      modelFish,
+      typeFront,
+      typeModel,
+      extraRigido,
+      barbatana,
+      modelColar,
+      typePense,
     };
+
+    const API_URL =
+      process.env.NODE_ENV === "production"
+        ? "https://tales-cotovia.onrender.com"
+        : "http://localhost:5000";
 
     // Enviar os dados para o servidor
     try {
-      const response = await fetch(
-        "https://tales-cotovia.onrender.com/send-email",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await fetch(`${API_URL}/send-email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
       const result = await response.json();
+      if (!response.ok) {
+        ConstructionOutlined.error("Erro ao enviar o email:", result);
+      }
       console.log(result); // Verifique a resposta do servidor no console
 
       if (result.success) {
@@ -344,6 +342,11 @@ function Measure() {
   const handleVendedorChange = (e) => {
     setVendedor(e.target.value);
   };
+
+  const handleClientChange = (e) => {
+    setClient(e.target.value);
+  };
+
   const closeModal = () => {
     setShowModal(false);
   };
@@ -355,8 +358,8 @@ function Measure() {
     }
     setter(numericValue);
   };
-  const handleIdChange = (i) => {
-    setId(i.target.value);
+  const handleIdChange = (e) => {
+    setId(e.target.value);
   };
   const handleDateChange = (event) => {
     setInputDate(event.target.value);
@@ -441,16 +444,15 @@ function Measure() {
     setTypeModel(e.target.value);
   };
   const handleTypeFrontChange = (e) => {
+    console.log("Valor de typeFront:", e.target.value);
     setTypeFront(e.target.value);
   };
   const handleTypePenseChange = (e) => {
     setTypePense(e.target.value);
   };
-  const handleDescriptionChange = (newDescription) => {
-    setDescription(newDescription); // Atualiza o estado de description
+  const handleDescriptionChange = (e) => {
+    setDescription(e.target.value);
   };
-  console.log("description no componente pai:", description);
-
   const validateFields = () => {
     console.log("Vendedor", vendedor);
     console.log("CPF", cpf);
@@ -465,6 +467,13 @@ function Measure() {
       setShowModal(true);
       return false;
     }
+
+    if (!client.trim()) {
+      setErroMessage("O Campo Cliente está vazio");
+      setShowModal(true);
+      return;
+    }
+
     if (!inputDate.trim()) {
       setErrorMessage("Informe uma DATA!");
       setShowModal(true);
@@ -583,17 +592,20 @@ function Measure() {
     return true;
   };
 
-  const handleTextChange = (e) => {
-    const newDescription = e.target.value;
-    console.log("Novo valor da descrição:", newDescription); // Verificando o valor
-    setDescription(newDescription); // Atualizando o estado
-  };
+  console.log("Descrição enviada para o ModalMeasure:", description);
+  console.log("ID antes de abrir o modal:", id);
+  useEffect(() => {
+    if (!id) {
+      setId(generateId()); // Gerar um id ou buscar de alguma API
+    }
+  }, [id]);
 
-  console.log("description no componente pai:", description);
+  const [pdfFile, setPdfFile] = useState(null); // Estado para armazenar o arquivo
 
-  const handleOpenMeasure = () => {
-    setOrderId((prevId) => prevId + 1); // Incrementa o pedido
-    setOpenMeasure(true);
+  const handleFileChange = (event) => {
+    const file = event.target.files[0]; // Obtém o primeiro arquivo selecionado
+    console.log("Arquivo PDF anexado:", file);
+    setPdfFile(file); // Armazena o arquivo no estado
   };
 
   return (
