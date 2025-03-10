@@ -34,6 +34,8 @@ if (!fs.existsSync(uploadPath)) {
 // Função para gerar PDF a partir de dados e template HTML usando Puppeteer
 const generatePdfWithPuppeteer = async (data) => {
   const browser = await puppeteer.launch({
+    executablePath:
+      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium-browser",
     headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
     timeout: 60000,
