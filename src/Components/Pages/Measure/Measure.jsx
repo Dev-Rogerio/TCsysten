@@ -1221,8 +1221,15 @@ function Measure() {
                   type="button"
                   onClick={(e) => {
                     e.preventDefault();
+                    console.log("Validando formulário...");
                     if (!validateFields()) {
+                      console.log(
+                        "Validação falhou. Corrija os campos obrigatórios."
+                      );
                       return;
+                      console.log(
+                        "Campos válidos! Preparando para enviar e-mail..."
+                      );
                     }
                     setOpenMeasure(!openMeasure);
                     console.log("Campo válido, coninuando...");

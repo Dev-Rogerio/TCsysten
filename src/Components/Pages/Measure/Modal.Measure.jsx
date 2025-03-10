@@ -34,16 +34,19 @@ const ModalMeasure = ({
   typeFront,
   typeModel,
   typePense,
-  description = "",
+  description = "", // Valor inicial da descrição
 }) => {
-  const [localDescription, setLocalDescription] = useState(description);
+  const [localDescription, setLocalDescription] = useState(description); // Inicializa com a descrição passada
   const navigate = useNavigate();
 
+  // Carregar a descrição apenas da prop 'description' (sem uso do localStorage)
   useEffect(() => {
     if (!openMeasure) return;
-    setLocalDescription(description || "");
+
+    setLocalDescription(description || ""); // Garantir que, caso não tenha descrição, use uma string vazia
   }, [openMeasure, description]);
 
+  // Função para enviar o e-mail com os dados do pedido
   const handleSendEmail = async () => {
     const emailData = {
       cpf,
@@ -77,27 +80,37 @@ const ModalMeasure = ({
     };
 
     try {
-      const response = await fetch("http://localhost:5000/send-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(emailData),
-      });
+      const response = await fetch(
+        "https://tales-cotovia.onrender.com/send-email",
+        {
+          // Ajuste a URL, adicione o endpoint "/send-email"
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(emailData),
+        }
+      );
 
-      const data = await response.json();
+      // Verificar se a resposta foi bem-sucedida
       if (response.ok) {
+        const data = await response.json(); // Aqui você obtém os dados da resposta
+        console.log("E-mail enviado com sucesso:", data); // Log para debug
         alert("E-mail enviado com sucesso!");
         setOpenMeasure(false);
       } else {
-        alert(`Erro ao enviar e-mail: ${data.message || "Erro desconhecido"}`);
+        const errorData = await response.json(); // Caso a resposta não seja ok, captura o erro
+        alert(
+          `Erro ao enviar e-mail: ${errorData.message || "Erro desconhecido"}`
+        );
       }
     } catch (error) {
-      console.error("Erro ao enviar e-mail:", error);
+      console.error("Erro ao enviar o e-mail:", error);
       alert("Ocorreu um erro ao tentar enviar o e-mail.");
     }
   };
 
+  // Função para imprimir o conteúdo do modal
   const handlePrint = () => {
     const originalBody = document.body.innerHTML;
     try {
@@ -109,14 +122,17 @@ const ModalMeasure = ({
     }
   };
 
+  // Função para fechar o modal
   const handleCloseModal = () => {
     setRows(rows);
     setOpenMeasure(false);
-    navigate("/");
+    navigate("/"); // Navega para a página de measure
   };
 
+  // Atualiza o valor de 'localDescription' quando o usuário digita no textarea
   const handleDescriptionChange = (e) => {
-    setLocalDescription(e.target.value);
+    const updatedDescription = e.target.value;
+    setLocalDescription(updatedDescription);
   };
 
   if (!openMeasure) return null;
@@ -124,14 +140,17 @@ const ModalMeasure = ({
   return (
     <div className="modal">
       <div>
+        {/* Header */}
         <section className="_navModalMeasure">
           <img src={LogoCotovia} alt="Logo Cotovia" />
         </section>
 
+        {/* Título */}
         <section className="text-titlle">
           <h1>Ficha Técnica do Pedido</h1>
         </section>
 
+        {/* Informações do Cliente e Pedido */}
         <div className="sectorClientSuplier">
           <section className="_sectionClient">
             <p>
@@ -139,6 +158,9 @@ const ModalMeasure = ({
             </p>
             <p>
               Cliente: <strong>{client}</strong>
+            </p>
+            <p>
+              Contato: <strong>{""}</strong>
             </p>
           </section>
           <section className="_sectionDateInfo">
@@ -157,8 +179,9 @@ const ModalMeasure = ({
           </section>
         </div>
 
+        {/* Medidas Personalizadas */}
         <div className="sectorPersonalized">
-          <section>
+          <section className="_firstLeft-MeasureDate">
             <p>
               Colar: <strong>{colar}</strong>
             </p>
@@ -193,7 +216,7 @@ const ModalMeasure = ({
               Punho D: <strong>{punhoDireito}</strong>
             </p>
           </section>
-          <section>
+          <section className="_secondRight-MeasureDate">
             <p>
               Calarinho: <strong>{modelColar}</strong>
             </p>
@@ -218,24 +241,53 @@ const ModalMeasure = ({
             <p>
               Modelo: <strong>{typeModel}</strong>
             </p>
+            <p>
+              Mtrs. de tecido: <strong>{metersTissue}</strong>
+            </p>
           </section>
         </div>
 
-        <div className="sectorDescription">
-          <label htmlFor="description">Descrição:</label>
+        {/* Área para descrição */}
+        <div className="_wrapperModArea">
           <textarea
-            id="description"
+            name="Importante"
+            id="important"
             value={localDescription}
-            onChange={handleDescriptionChange}
-            placeholder="Detalhes adicionais..."
+            onChange={handleDescriptionChange} // Atualiza a descrição com o valor digitado
           />
         </div>
 
-        <section className="actions">
-          <button onClick={handleSendEmail}>Enviar E-mail</button>
-          <button onClick={handlePrint}>Imprimir</button>
-          <button onClick={handleCloseModal}>Fechar</button>
-        </section>
+        {/* Botões */}
+        <div className="sectorBotton">
+          <section className="_wrapper-divFooter">
+            <div className="areaButton">
+              <button onClick={handleSendEmail}>Enviar E-mail</button>
+              <button onClick={handlePrint}>Imprimir</button>
+              <button onClick={handleCloseModal}>Corrigir</button>
+            </div>
+          </section>
+        </div>
+
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Cód. Produto</th>
+              <th>Cód. Tecido</th>
+              <th>Textura</th>
+              <th>Fornecedor</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, index) => (
+              <tr key={index}>
+                <td>{row.codTextil}</td>
+                <td>{row.codProduct}</td>
+                <td>{row.texture}</td>
+                <td>{row.fornecedor}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
