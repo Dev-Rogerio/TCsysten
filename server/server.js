@@ -119,6 +119,14 @@ app.post("/send-email", upload.none(), async (req, res) => {
       },
     });
 
+    transporter.verify((error, success) => {
+      if (error) {
+        console.error("Erro na configuração do Nodemailer:", error);
+      } else {
+        console.log("Servidor de e-mail pronto para enviar mensagens.");
+      }
+    });
+
     // Definição das opções do e-mail
 
     const timestamp = Date.now();
