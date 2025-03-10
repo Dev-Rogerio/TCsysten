@@ -13,8 +13,7 @@ const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Configurações de OAuth2
-
+// Configuração do OAuth2
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
@@ -30,13 +29,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
-
-// Configuração do multer para uploads
-const upload = multer({ dest: "uploads/" });
-const uploadPath = "./uploads";
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath);
-}
 
 // Função para gerar o PDF com Puppeteer
 const generatePdfWithPuppeteer = async (data) => {
@@ -85,8 +77,13 @@ app.get("/auth/google", (req, res) => {
 app.get("/callback", async (req, res) => {
   const { code } = req.query;
   try {
+    // A obtenção dos tokens precisa ser dentro de uma função async
     const { tokens } = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(tokens);
+    oauth2Client.setCredentials(tokens); // Armazena os tokens no servidor
+
+    console.log("Access Token:", tokens.access_token);
+    console.log("Refresh Token:", tokens.refresh_token);
+
     res.send("Autenticado com sucesso!");
   } catch (error) {
     res.status(500).send("Erro na autenticação");
@@ -102,8 +99,8 @@ async function createTransporter(auth) {
       user: process.env.EMAIL_FROM,
       clientId: CLIENT_ID,
       clientSecret: CLIENT_SECRET,
-      refreshToken: auth.credentials.refresh_token,
-      accessToken: auth.credentials.access_token,
+      refreshToken: auth.credentials.refresh_token, // Usando os tokens salvos
+      accessToken: auth.credentials.access_token, // Usando os tokens salvos
     },
   });
   return transporter;
