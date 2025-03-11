@@ -198,22 +198,22 @@ function Measure() {
 
   // ____________________________________________________________________________________________________________
 
-  const TestConnection = () => {
-    useEffect(() => {
-      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000"; // Usando a variável de ambiente
+  // const TestConnection = () => {
+  //   useEffect(() => {
+  //     const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000"; // Usando a variável de ambiente
 
-      axios
-        .get(`${apiUrl}/`)
-        .then((response) => {
-          console.log("Resposta do servidor:", response.data);
-        })
-        .catch((error) => {
-          console.error("Erro ao conectar com o servidor:", error);
-        });
-    }, []);
+  //     axios
+  //       .get(`${apiUrl}/`)
+  //       .then((response) => {
+  //         console.log("Resposta do servidor:", response.data);
+  //       })
+  //       .catch((error) => {
+  //         console.error("Erro ao conectar com o servidor:", error);
+  //       });
+  //   }, []);
 
-    return <div>Testando conexão com o servidor...</div>;
-  };
+  //   return <div>Testando conexão com o servidor...</div>;
+  // };
 
   const fetchClientData = async (cpf) => {
     try {

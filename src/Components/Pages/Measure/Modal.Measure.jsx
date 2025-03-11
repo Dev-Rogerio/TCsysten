@@ -100,6 +100,7 @@ const ModalMeasure = ({
         setOpenMeasure(false);
       } else {
         const errorData = await response.json(); // Caso a resposta não seja ok, captura o erro
+        console.error("Erro ao enviar e-mail:", errorData);
         alert(
           `Erro ao enviar e-mail: ${errorData.message || "Erro desconhecido"}`
         );
